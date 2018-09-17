@@ -41,7 +41,6 @@ ggplot(Cor_by_region, aes(factor(region), violations, fill = factor(prepost))) +
   scale_fill_brewer(palette = "Set1")
 
 
-
 # Add boxplots to a scatterplot (custom function that got more complicated that it should have, 
 # need to execute the block of code down to "}" before "enhanced_scatter" lines below)
 enhanced_scatter = function(x, y, xlab = "Violations", ylab = "", main_title = "") {
@@ -72,6 +71,27 @@ enhanced_scatter((cor_pre$violations/cor_pre$staff), cor_pre$corruption, "Violat
 enhanced_scatter((cor_pos$violations/cor_pre$staff), cor_pos$corruption, "Violations/Staff", "Corruption", 
                  paste("After 2002 Change - Corelation:", cor((cor_pos$violations/cor_pre$staff), cor_pos$corruption, use = "complete.obs")))
 
+# plain scatter plots
+plot((cor_pre$violations/cor_pre$staff), cor_pre$corruption)
+abline(lm((cor_pre$violations/cor_pre$staff ~ cor_pre$corruption)))
+
+plot((cor_pos$violations/cor_pos$staff), cor_pos$corruption)
+abline(lm((cor_pos$violations/cor_pos$staff ~ cor_pos$corruption)))
+
+
+
+# plain scatter plots
+plot((cor_pre$violations/cor_pre$staff), cor_pre$corruption)
+abline(lm((cor_pre$violations/cor_pre$staff) ~ cor_pre$corruption))
+
+plot(log((cor_pos$violations/cor_pos$staff) + 1), cor_pos$corruption)
+abline(lm(log((cor_pos$violations/cor_pos$staff) + 1) ~ cor_pos$corruption))
+
+
+plot(log((cor_pos$violations/cor_pos$staff) + 1), cor_pos$corruption)
+abline(lm(log((cor_pos$violations/cor_pos$staff) + 1) ~ cor_pos$corruption))
+
+abline((log((cor_pos$violations/cor_pos$staff + 1) ~ cor_pos$corruption)))
 
 # scatter plot of corruption per staff both pre and post for each region
 
@@ -82,6 +102,7 @@ enhanced_scatter((cor_pre_reg$violations/cor_pre_reg$staff), cor_pre_reg$corrupt
                  paste("Before 2002 Change - Corelation:", cor((cor_pre_reg$violations/cor_pre_reg$staff), cor_pre_reg$corruption, use = "complete.obs")))
 enhanced_scatter((cor_pos_reg$violations/cor_pre_reg$staff), cor_pos_reg$corruption, "Violations/Staff", "Corruption", 
                  paste("After 2002 Change - Corelation:", cor((cor_pos_reg$violations/cor_pre_reg$staff), cor_pos_reg$corruption, use = "complete.obs")))
+
 
 # Scatter Plot Matrix for regions before 2002
 scatterplotMatrix( ~ corruption + violations + cars_total + staff, data = cor_pre_reg,
