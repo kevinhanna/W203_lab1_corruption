@@ -73,25 +73,20 @@ enhanced_scatter((cor_pos$violations/cor_pre$staff), cor_pos$corruption, "Violat
 
 # plain scatter plots
 plot((cor_pre$violations/cor_pre$staff), cor_pre$corruption)
-abline(lm((cor_pre$violations/cor_pre$staff ~ cor_pre$corruption)))
+abline(lm((cor_pre$violations/cor_pre$staff ~ cor_pre$corruption)), col="blue")
 
 plot((cor_pos$violations/cor_pos$staff), cor_pos$corruption)
-abline(lm((cor_pos$violations/cor_pos$staff ~ cor_pos$corruption)))
+abline(lm((cor_pos$violations/cor_pos$staff ~ cor_pos$corruption)), col="red")
 
 
 
 # plain scatter plots
-plot((cor_pre$violations/cor_pre$staff), cor_pre$corruption)
-abline(lm((cor_pre$violations/cor_pre$staff) ~ cor_pre$corruption))
+plot(log((cor_pre$violations/cor_pre$staff) + 10), cor_pre$corruption)
+abline(lm(log((cor_pre$violations/cor_pre$staff) + 10) ~ cor_pre$corruption), col="blue")
 
 plot(log((cor_pos$violations/cor_pos$staff) + 1), cor_pos$corruption)
-abline(lm(log((cor_pos$violations/cor_pos$staff) + 1) ~ cor_pos$corruption))
+abline(lm(log((cor_pos$violations/cor_pos$staff) + 1) ~ cor_pos$corruption), col="red")
 
-
-plot(log((cor_pos$violations/cor_pos$staff) + 1), cor_pos$corruption)
-abline(lm(log((cor_pos$violations/cor_pos$staff) + 1) ~ cor_pos$corruption))
-
-abline((log((cor_pos$violations/cor_pos$staff + 1) ~ cor_pos$corruption)))
 
 # scatter plot of corruption per staff both pre and post for each region
 

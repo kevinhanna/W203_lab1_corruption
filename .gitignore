@@ -1,3 +1,8 @@
+.Rproj.user
+corruption_workspace.R
+
+
+
 # History files
 .Rhistory
 .Rapp.history
@@ -24,5 +29,5 @@ vignettes/*.pdf
 *.knit.md
 # Shiny token, see https://shiny.rstudio.com/articles/shinyapps.html
 rsconnect/
-.Rproj.user
-corruption_workspace.R
+
+

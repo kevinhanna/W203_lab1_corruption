@@ -46,12 +46,12 @@ FMcorrupt[FMcorrupt$region == 7 & ! is.na(FMcorrupt$region), "region_name"] = "M
 FMcorrupt$region_name = factor(FMcorrupt$region_name)
 
 # Remove 66 rows that do not have relevant data to the key analyses
-cor = subset(FMcorrupt, !is.na(violations) & !is.na(mission) & !is.na(staff) )
+corrupt = subset(FMcorrupt, !is.na(violations) & !is.na(mission) & !is.na(staff) )
 
 
 # split data in to pre and post, before and after enforcement changes
-cor_pre = subset(cor, prepost == "pre")
-cor_pos = subset(cor, prepost == "pos")
+cor_pre = subset(corrupt, prepost == "pre")
+cor_pos = subset(corrupt, prepost == "pos")
 
 # Merge both the above to one line with pre and pos appeneded to variable names (prepos removed)
 cor_oneline = merge(cor_pre, cor_pos, by = "wbcode", suffixes = c(".pre", ".pos"))
