@@ -23,17 +23,17 @@ load("Corrupt.Rdata")
 FMcorrupt[FMcorrupt$majoritymuslim == -1 & ! is.na(FMcorrupt$majoritymuslim), "majoritymuslim"] = 0
 
 # Add missing counties.  Reference: https://www.worldatlas.com/aatlas/ctycodes.htm
-FMcorrupt[FMcorrupt$wbcode == "ARE", "country"] = "United Arab Emirates"
-FMcorrupt[FMcorrupt$wbcode == "CAF", "country"] = "Central African Republic"
-FMcorrupt[FMcorrupt$wbcode == "CAN", "country"] = "Canada"
-FMcorrupt[FMcorrupt$wbcode == "COL", "country"] = "Columbia"
-FMcorrupt[FMcorrupt$wbcode == "ECU", "country"] = "Ecuador"
-FMcorrupt[FMcorrupt$wbcode == "JAM", "country"] = "Jamaica"
-FMcorrupt[FMcorrupt$wbcode == "LVA", "country"] = "Latvia"
-FMcorrupt[FMcorrupt$wbcode == "NOR", "country"] = "Norway"
-FMcorrupt[FMcorrupt$wbcode == "PAN", "country"] = "Panama"
-FMcorrupt[FMcorrupt$wbcode == "SWE", "country"] = "Sweden"
-FMcorrupt[FMcorrupt$wbcode == "TUR", "country"] = "Turkey"
+FMcorrupt[FMcorrupt$wbcode == "ARE", "country"] = "UNITED ARAB EMIRATES"
+FMcorrupt[FMcorrupt$wbcode == "CAF", "country"] = "CENTRAL AFRICAN REPUBLIC"
+FMcorrupt[FMcorrupt$wbcode == "CAN", "country"] = "CANADA"
+FMcorrupt[FMcorrupt$wbcode == "COL", "country"] = "COLUMBIA"
+FMcorrupt[FMcorrupt$wbcode == "ECU", "country"] = "ECUADOR"
+FMcorrupt[FMcorrupt$wbcode == "JAM", "country"] = "JAMAICA"
+FMcorrupt[FMcorrupt$wbcode == "LVA", "country"] = "LATVIA"
+FMcorrupt[FMcorrupt$wbcode == "NOR", "country"] = "NORWAY"
+FMcorrupt[FMcorrupt$wbcode == "PAN", "country"] = "PANAMA"
+FMcorrupt[FMcorrupt$wbcode == "SWE", "country"] = "SWEDEN"
+FMcorrupt[FMcorrupt$wbcode == "TUR", "country"] = "TURKEY"
 
 # Create named regions variable using region
 FMcorrupt$region_name = NA
@@ -88,11 +88,13 @@ remove(FMcorrupt)
 ## Research Question
 Prior to 2002 there were no measures New York City (NYC) was able to take to enforce payment of parking violations from UN officials who have diplomatic emmunity. Therefore, payment was largely a function of cultural norms.  In 2002 NYC parking enforcement acquired the right to confiscate license plates from vehicles belonging to foreign diplomats if they had accumulated unpaid parking violations, thus making payment an function of both cultral norms and legal enforcment.  
  
-In our exploratory data analysis, we will describe how cultural norms affect the payment of parking violations by researching the number of violations diplomats had accumulated both before and after the enforcement changes using the corruption index of the country of the embassy they are accociated with.  
+In our exploratory data analysis, we will describe how cultural norms affect the payment of parking violations by researching the number of violations diplomats had accumulated both before and after the enforcement changes using the corruption index of the country of the embassy they are accociated with. 
+
+**How do a country's corruption and fine enforcement affect its diplomats' parking behavior?**
 
 ## Description of Dataset
 
-Our data set has a total of 364 observations, there are two observation for each country, where only the number of violations and value of the fines changes, one before NYC gained the ability to enforce non-payment, and another after. 
+Our data set has a total of 364 observations, there are two observation for each country, where only the number of violations and value of the fines changes, one before NYC gained the ability to enforce non-payment, and another after.  
 
 
 
@@ -110,13 +112,14 @@ may be appropriate for each variable.
 Key Variables:
 
 * violations
+* corruption
 * staff
 * trade
 
 There are 66 observations that contain only economic data leaving NA for our dependent variable, violations. Considering the countries that are among these 66 we suspect these rows result from a merge of economic data with the violations data ($econmic\cup violations$) and the economic data set had countries that did not have embasies in Manhattan.  Removing these superfluous observations results in the intersection of the two data sets ($economic\cap violations$), which is what we desire. With those 66 rows removed, we're left with 298 observations (two observations for each of 149 countries where corruption data exists.)
 
 
-
+* show plots and summary data for key variables
 
 ```{r results="asis"}
 # Use CSV version of Google Sheet 'Variable Description for Introduction': https://docs.google.com/spreadsheets/d/1cas_xxfaAY5CNGDAvBqa4ky5b8m61i3qTSgN4LrHT_g/edit#gid=621892365
@@ -174,19 +177,34 @@ variable could be used to test that relationship.
 remove(variable_description)
 ```
 
+
+
+
 ```{r results="asis"}
 
 # This is assuming staff is better than cars, staff+spouse, total_cars.  Though I don't know if that's safe yet.
+
+### Probably makes sense tomove this above
+round_df <- function(x, digits) {
+    # round all numeric variables
+    # x: data frame 
+    # digits: number of digits to round
+    numeric_columns <- sapply(x, mode) == 'numeric'
+    x[numeric_columns] <-  round(x[numeric_columns], digits)
+    x
+}
 
 summary_table_output = cor_oneline[, c("country", "staff", "violations.pre", "violations.pos", "corruption")]
 summary_table_output$mean_violations_per_staff.pre = summary_table_output$violations.pre/summary_table_output$staff
 summary_table_output$mean_violations_per_staff.pos = summary_table_output$violations.pos/summary_table_output$staff
 
+tmp_rounded = round_df(summary_table_output[, c("country", "mean_violations_per_staff.pre", "mean_violations_per_staff.pos", "corruption")], 2)
+tmp_rounded = tmp_rounded[order(tmp_rounded$mean_violations_per_staff.pre, decreasing = TRUE), ]
 #TODO Sort, Round
 
-kable(summary_table_output[1:10, c("country", "mean_violations_per_staff.pre", "mean_violations_per_staff.pos", "corruption")], 
+kable(tmp_rounded[1:20, ], 
       "latex", longtable = TRUE, booktabs = TRUE, 
-      caption = "NOT YET SORTED BY VIOLATIONS - Top 10 Countries by Parking Violations", 
+      caption = "Top 20 Countries by Parking Violations (Key Variables)", 
       col.names = c("Country", "Mean Violations per Staff Before 2002 Change", "Mean Violations per Staff After 2002 Change", "Corruption Index")) %>%
   kable_styling(full_width = TRUE, latex_options = c("HOLD_position", "striped", "repeat_header"), row_label_position = 1)   
 
@@ -197,22 +215,41 @@ kable(summary_table_output[1:10, c("country", "mean_violations_per_staff.pre", "
 
 
 ```{r}
-remove(summary_table_output)
+remove(summary_table_output, tmp_rounded)
 ```
 <!-- END UNIVARIATE ANALYSIS OF KEY VARIABLES --> 
 
 <!-- START ANALYSIS OF KEY RELATIONSHIPS --> 
+<!--
+Analysis of Key Relationships (30 pts)
+Explore how your outcome variable is related to the other variables in your dataset. Make sure to use
+visualizations to understand the nature of each bivariate relationship.
+What tranformations can you apply to clarify the relationships you see in the data? Be sure to justify each
+transformation you use.
+-->
 # Analysis of Key Relationships
 
 <!-- END ANALYSIS OF KEY RELATIONSHIPS --> 
 
 <!-- START ANALYSIS OF SECONDARY EFFECTS --> 
+<!--
+Analysis of Secondary Effects (10 pts)
+What secondary variables might have confounding effects on the relationships you have identified? Explain
+how these variables affect your understanding of the data.
+-->
 # Analysis of Secondary Effects
-
 <!-- END ANALYSIS OF SECONDARY EFFECTS --> 
 
+* show that pctmuslim doesn't have much relevance
+* analyze trade relationship
+* analyze gov_wage_gdp (particular after, when fines are being paid)
+* does region have any *meaningful* relationship to violations?
 
 <!-- BEGIN CONCLUSION -->
+<!--
+Conclusion (20 pts)
+Summarize your exploratory analysis. What can you conclude based on your analysis?
+-->
 # Conclusion
-
+Some poople used to be jerks.  But now they're not. Enforcing fines works on Jerks.  Canadian's are not jerks (bias: author: Hanna, is a Canadian)
 <!-- END CONCLUSION -->
