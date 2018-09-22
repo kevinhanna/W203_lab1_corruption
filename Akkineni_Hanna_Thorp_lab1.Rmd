@@ -179,13 +179,18 @@ remove(variable_description)
 # This is assuming staff is better than cars, staff+spouse, total_cars.  Though I don't know if that's safe yet.
 
 summary_table_output = cor_oneline[, c("country", "staff", "violations.pre", "violations.pos", "corruption")]
-summary_table_output$mean.pre = summary_table_output$violations.pre/summary_table_output$staff
-summary_table_output$mean.pos = summary_table_output$violations.pos/summary_table_output$staff
+summary_table_output$mean_violations_per_staff.pre = summary_table_output$violations.pre/summary_table_output$staff
+summary_table_output$mean_violations_per_staff.pos = summary_table_output$violations.pos/summary_table_output$staff
 
 #TODO Sort, Round
 
-kable(summary_table_output[1:10, ], caption = "NOT YET SORTED BY VIOLATIONS - Top 10 Countries by Parking Violations") %>%
-  kable_styling(full_width = FALSE)
+kable(summary_table_output[1:10, c("country", "mean_violations_per_staff.pre", "mean_violations_per_staff.pos", "corruption")], 
+      "latex", longtable = TRUE, booktabs = TRUE, 
+      caption = "NOT YET SORTED BY VIOLATIONS - Top 10 Countries by Parking Violations", 
+      col.names = c("Country", "Mean Violations per Staff Before 2002 Change", "Mean Violations per Staff After 2002 Change", "Corruption Index")) %>%
+  kable_styling(full_width = TRUE, latex_options = c("HOLD_position", "striped", "repeat_header"), row_label_position = 1)   
+
+
 
 ```
 
