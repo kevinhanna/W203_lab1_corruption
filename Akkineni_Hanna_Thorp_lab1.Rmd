@@ -92,15 +92,30 @@ In our exploratory data analysis, we will describe how cultural norms affect the
 
 ## Description of Dataset
 
-Our data set has a total of 364 observations, there are two observation for each country, where only the number of violations and value of the fines changes, one before NYC gained the ability to enforce non-payment, and another after. Additionally, there are 66 observations that we have removed (reasoning and expected effect described below) leaving us with 149 observations with the following variables.
+Our data set has a total of 364 observations, there are two observation for each country, where only the number of violations and value of the fines changes, one before NYC gained the ability to enforce non-payment, and another after. 
 
 
 
-TODO
+<!-- END INTRODUCTION -->
+<!-- BEGIN UNIVARIATE ANALYSIS OF KEY VARIABLES --> 
+<!--
+Univariate Analysis of Key Variables (20 pts)
+Use visualizations and descriptive statistics to perform a univariate analysis of each key variable. Be sure to
+describe any anomalies, coding issues, or potentially erroneous values. Explain how you respond to each issue
+you identify. Note any features that appear relevant to statistical analysis. Discuss what transformations
+may be appropriate for each variable.
+-->
+# Univariate Analysis of Key Variables
 
-* explain why removing 66 obs is unlikely to impact
-    + There are 213 unique values for wbcode, whereas there are only 151 countries with pre and post-legislation
-* 
+Key Variables:
+
+* violations
+* staff
+* trade
+
+There are 66 observations that contain only economic data leaving NA for our dependent variable, violations. Considering the countries that are among these 66 we suspect these rows result from a merge of economic data with the violations data ($econmic\cup violations$) and the economic data set had countries that did not have embasies in Manhattan.  Removing these superfluous observations results in the intersection of the two data sets ($economic\cap violations$), which is what we desire. With those 66 rows removed, we're left with 298 observations (two observations for each of 149 countries where corruption data exists.)
+
+
 
 
 ```{r results="asis"}
@@ -112,7 +127,6 @@ kable(variable_description, "latex", longtable = TRUE, booktabs = TRUE, caption 
   kable_styling(full_width = TRUE, latex_options = c("HOLD_position", "striped", "repeat_header"), row_label_position = 1)   
 
 ```
-
 
 
 #Alex notes to be incorporated above
@@ -159,7 +173,6 @@ variable could be used to test that relationship.
 ```{r}
 remove(variable_description)
 ```
-<!-- END INTRODUCTION -->
 
 ```{r results="asis"}
 
@@ -181,3 +194,20 @@ kable(summary_table_output[1:10, ], caption = "NOT YET SORTED BY VIOLATIONS - To
 ```{r}
 remove(summary_table_output)
 ```
+<!-- END UNIVARIATE ANALYSIS OF KEY VARIABLES --> 
+
+<!-- START ANALYSIS OF KEY RELATIONSHIPS --> 
+# Analysis of Key Relationships
+
+<!-- END ANALYSIS OF KEY RELATIONSHIPS --> 
+
+<!-- START ANALYSIS OF SECONDARY EFFECTS --> 
+# Analysis of Secondary Effects
+
+<!-- END ANALYSIS OF SECONDARY EFFECTS --> 
+
+
+<!-- BEGIN CONCLUSION -->
+# Conclusion
+
+<!-- END CONCLUSION -->
