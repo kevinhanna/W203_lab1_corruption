@@ -86,46 +86,58 @@ remove(FMcorrupt)
 # Introduction
 
 ## Research Question
-Prior to 2002 there were no measures New York City (NYC) was able to take to enforce payment of parking violations from UN officials how have diplomatic emmunity. Therefore, payment was largely a function cultural norms.  In 2002 NYC parking enforcement acquired the right to confiscate license plates from veicles belonging to US diplomats if they had accumulated unpaid parking violations making payment an function of both cultral norms and legal enforcment.  
+Prior to 2002 there were no measures New York City (NYC) was able to take to enforce payment of parking violations from UN officials who have diplomatic emmunity. Therefore, payment was largely a function of cultural norms.  In 2002 NYC parking enforcement acquired the right to confiscate license plates from vehicles belonging to foreign diplomats if they had accumulated unpaid parking violations, thus making payment an function of both cultral norms and legal enforcment.  
  
- In our exploratory data analysis, we will describe how cultural norms affect the payment of parking violations by researching the the number of violations diplomats had accumulated both before and after the enforcement changes using the corruption index of country they of the embassy they are accociated with.  
+In our exploratory data analysis, we will describe how cultural norms affect the payment of parking violations by researching the number of violations diplomats had accumulated both before and after the enforcement changes using the corruption index of the country of the embassy they are accociated with.  
 
 ## Description of Dataset
 
 Our data set has a total of 364 observations, there are two observation for each country, where only the number of violations and value of the fines changes, one before NYC gained the ability to enforce non-payment, and another after. Additionally, there are 66 observations that we have removed (reasoning and expected effect described below) leaving us with 149 observations with the following variables.
+
+
+
+TODO
+
+* explain why removing 66 obs is unlikely to impact
+    + There are 213 unique values for wbcode, whereas there are only 151 countries with pre and post-legislation
+* 
+
 
 ```{r results="asis"}
 # Use CSV version of Google Sheet 'Variable Description for Introduction': https://docs.google.com/spreadsheets/d/1cas_xxfaAY5CNGDAvBqa4ky5b8m61i3qTSgN4LrHT_g/edit#gid=621892365
 variable_description = read.csv("Lab 1 - Variable Descriptions for Introduction.csv", header = TRUE, sep = ",", quote = "\"", allowEscapes = TRUE)
 #summary(variable_description)
 
-kable(variable_description, caption = "Variables Used") %>%
-  kable_styling(full_width = FALSE)
+kable(variable_description, "latex", longtable = TRUE, booktabs = TRUE, caption = "Data Set Variables") %>%
+  kable_styling(full_width = TRUE, latex_options = c("HOLD_position", "striped", "repeat_header"), row_label_position = 1)   
 
 ```
 
 
 
-#Alex notes to be explained above
+#Alex notes to be incorporated above
 
-"""Data quality issues:
-1) We have several extra observations that have NaN values for key variables. These data likely reflect a merging 
+"""Data quality issues:  
+~~1) We have several extra observations that have NaN values for key variables. These data likely reflect a merging 
 process wherein the desired dataset regarding parking violations and fines was merged with economic data. 
 +wbcode is impacted by this. There are 213 unique values for wbcode, whereas there are only 151 countries with pre and post-legislation 
 observations
-++++Suggestion: We drop the N/A variables and note the number of countries for which we have no data.
+++++Suggestion: We drop the N/A variables and note the number of countries for which we have no data.~~
+
 2) The violations and fines data are odd. The instructions do not provide adequate background regarding these variables.
 This is a particular problem because these variable are at the core of the proposed analysis.
 Oddities:
 +violations has 7 decimal places. This is odd because we would expect a positive integer (in the case of a single year)
-or at least a figure that is recognizable as an average of some sort (in the case of multiple years)
+or at least a figure that is recognizable as an average of some sort (in the case of multiple years)  
+
 3) The mission, staff, and spouse variables also contain oddities. For example, the entries for HKG and PRI are 0. These are the only zeros in 
 those variables. Looking at the values for other variables for those two observations, some other oddities emerge. For example:
 +HKG's majoritymuslim (which should be a dummy variable of either 1 or 0) is -1
 ++++Suggestion: Given that our research question regards the impact of the corruption on willingness to incur parking
 violations and fines in NYC, we probably do not care about observations without a mission in NYC.
 As such, taking all of these oddities and the low desirability of the data, I recommend excluding. where 
-mission equals 0 or NaN
+mission equals 0 or NaN  
+
 4) The variable gov_wage_gdp is not specified in the instructions, and no source for the data is provided. We don't know if this comes from 
 an official sector body or from some potentially less rigorous institution. Furthermore, the data appears somewhat disconnected from our 
 core violations and fines variables, as there are numerous NaNs for gov_wage_gdp where valid values exist for violations and fines. I do think
@@ -135,13 +147,14 @@ salaries would be less willing to incur fines out of their own pocket. This is p
 workers themselves would definitely be the ones paying for the fines. 
 ++++Suggestion: Given that we don't know the provenance of this dataset nor how it was calculated, I would not treat results using this
 dataset with a high degree of confidence. Rather, I would be inclined to largely exclude this variable from the analysis
-At most, it should be used with caution in it's own separate section.
+At most, it should be used with caution in it's own separate section.  
+
 5) The variable pctmuslim is among the more complete variables outside the core violations and fines dataset. We are not told the origin of this variable
 either, so we have no idea of its veracity other than a common sense check. The thought behind including this variable may be that religion
 and perhaps, Islam in particular, would have an impact on ethical or ethical (corrupt) behavior. It is not clear to me why Islam would be 
 included and all other religions excluded. A more appropriate variable would be the percent of population which practices religion. It is 
 also not clear to me that the ethics-religion association is necessarily as strong as some might think it is, though a more valid non-biased
-variable could be used to test that relationship.
+variable could be used to test that relationship.  
 """
 ```{r}
 remove(variable_description)
