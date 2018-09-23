@@ -86,15 +86,13 @@ remove(FMcorrupt)
 # Introduction
 
 ## Research Question
-Prior to 2002 there were no measures New York City (NYC) was able to take to enforce payment of parking violations from UN officials who have diplomatic emmunity. Therefore, payment was largely a function of cultural norms.  In 2002 NYC parking enforcement acquired the right to confiscate license plates from vehicles belonging to foreign diplomats if they had accumulated unpaid parking violations, thus making payment an function of both cultral norms and legal enforcment.  
- 
-In our exploratory data analysis, we will describe how cultural norms affect the payment of parking violations by researching the number of violations diplomats had accumulated both before and after the enforcement changes using the corruption index of the country of the embassy they are accociated with. 
+Prior to 2002 diplomats at UN missions were exampt from parking violations and fines in New York City, by virtue of their diplomatic immunity. There was wide variation in diplomats' willingness to adhere to local parking laws. This analysis attempts to understand whether the variation in adherance to local parking law was related to cultural norms in the diplomats' home countries. For the period prior to 2002, we examine the relationship between perceptions of corruption in that country and  that countries' diplomats' willingness to incur parking violations. In 2002 NYC parking enforcement acquired the right to confiscate license plates from vehicles belonging to foreign diplomats if they had accumulated unpaid parking violations, thus making payment an function of both cultral norms and legal enforcment. This had a notable compressing effect on parking law adherence. 
 
-**How do a country's corruption and fine enforcement affect its diplomats' parking behavior?**
+**Question:** Does an index of perceived corruption in the diplomats' home country have explanatory power for a given diplomatic mission's compliance with local parking regulations?
 
 ## Description of Dataset
 
-Our data set has a total of 364 observations, there are two observation for each country, where only the number of violations and value of the fines changes, one before NYC gained the ability to enforce non-payment, and another after.  
+Our data set has a total of 364 observations. Of the 364, 66 observations contain only economic data leaving NA for our dependent variable, violations. Considering the countries that are among these 66 and the variables for which they have valid data, we suspect these rows result from a merge of economic data with the violations data ($econmic\cup violations$). As such, we believe these 66 countries represent a data artefact from that data merge. As these observations do not contain valid values for key variables, we remove them from our dataset. Of note, those 66 observations appear to contain many which do not even have a mission or staff in New York City, and as such are not relevant for this study on diplomatic parking violations in New York City. Given these considerations, we feel comfortable that we are not biasing the results of the study by remiving these observations. With those 66 rows removed, we're left with 298 observations (two observations for each of 149 countries where corruption data exists.) Each country has one observation from prior to the 2002 regulation change and one observation from after. Only the 'violations' and 'fines' variables differ between the two observations for a given country, while other variables remain constant. 
 
 
 
@@ -114,12 +112,15 @@ Key Variables:
 * violations
 * corruption
 * staff
-* trade
+* trade (maybe?)
 
 There are 66 observations that contain only economic data leaving NA for our dependent variable, violations. Considering the countries that are among these 66 we suspect these rows result from a merge of economic data with the violations data ($econmic\cup violations$) and the economic data set had countries that did not have embasies in Manhattan.  Removing these superfluous observations results in the intersection of the two data sets ($economic\cap violations$), which is what we desire. With those 66 rows removed, we're left with 298 observations (two observations for each of 149 countries where corruption data exists.)
 
 
 * show plots and summary data for key variables
+    + Summary table
+    + Frequency Distribution
+    
 
 ```{r results="asis"}
 # Use CSV version of Google Sheet 'Variable Description for Introduction': https://docs.google.com/spreadsheets/d/1cas_xxfaAY5CNGDAvBqa4ky5b8m61i3qTSgN4LrHT_g/edit#gid=621892365
@@ -131,6 +132,7 @@ kable(variable_description, "latex", longtable = TRUE, booktabs = TRUE, caption 
 
 ```
 
+<!--
 
 #Alex notes to be incorporated above
 
@@ -173,6 +175,7 @@ included and all other religions excluded. A more appropriate variable would be 
 also not clear to me that the ethics-religion association is necessarily as strong as some might think it is, though a more valid non-biased
 variable could be used to test that relationship.  
 """
+-->
 ```{r}
 remove(variable_description)
 ```
@@ -243,6 +246,7 @@ how these variables affect your understanding of the data.
 * show that pctmuslim doesn't have much relevance
 * analyze trade relationship
 * analyze gov_wage_gdp (particular after, when fines are being paid)
+    + Countries with higher violations + higher corruption index might be low gov_wage_gdp (might also mean small governemnt, so population might also be a factor)
 * does region have any *meaningful* relationship to violations?
 
 <!-- BEGIN CONCLUSION -->
