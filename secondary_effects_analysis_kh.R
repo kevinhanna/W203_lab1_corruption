@@ -1,5 +1,5 @@
 setwd("C:/Users/kevin/OneDrive/School/MIDS/W203 - Statistics for Data Science/Lab 1/W203_lab1_corruption")
-#library(car)
+library(car)
 #library(grid)
 #library(ggplot2)
 library(knitr)
@@ -73,7 +73,7 @@ remove(FMcorrupt)
 names(cor_oneline)
 
 correlation_matrix_input = cor_oneline[, c("corruption", "violations.pre", "fines.pre", "violations.pos", "fines.pos",
-                                           "staff", "spouse", "majoritymuslim", "pctmuslim", "trade", "cars_total", "cars_mission", "totaid", "gov_wage_gdp",  "distUNplz"
+                                           "staff", "spouse", "majoritymuslim", "pctmuslim", "trade", "cars_total", "cars_mission", "totaid", "gov_wage_gdp",  "distUNplz", "gdppcus1998", "totaid"
 )]
 
 
@@ -92,7 +92,8 @@ cor_correlations = round(cor(correlation_matrix_input[ , !(names(correlation_mat
 sort(cor_correlations[,c("corruption")][], decreasing = TRUE)
 
 # There is a strong correlation between staff and trade (.427)
-# correlation wage and corruption
+# correlation wage, gdp and corruption
+# total aid and violations
 
 head(subset(corrupt, corrupt$wbcode %in% c("CAN", "NOR")))
 head(subset(cor_nas, cor_nas$wbcode %in% c("CAN", "NOR")))
@@ -109,3 +110,10 @@ plot(correlation_matrix_input$corruption, correlation_matrix_input$violations_we
 abline(lm(correlation_matrix_input$corruption ~ correlation_matrix_input$violations_weighted.total_people.pos), col="red")
 plot(correlation_matrix_input$corruption, correlation_matrix_input$trade)
 plot(1,1)
+
+
+# Investigate the relationships between wage, gdp pc and corruption.
+
+scatterplotMatrix( ~ corruption + gov_wage_gdp + gdppcus1998 + staff + totaid, data = corrupt,
+                   main = "Scatterplot Matrix for Regions Before 2002", na.rm = TRUE)
+

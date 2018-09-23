@@ -1,32 +1,26 @@
 Variable,Description,Observations,Alterations
 wbcode,Three Letter Country code,,
+country,country name,"Some missing values, though wbcode are available. ",Missing values were filled using wbcode variable.
+corruption,Country corruption index ,"Min. = -2.58299 (Least corrupt), Max. = 1.58281 (Most corrupt)",
 violations.pre,The number of violations accumulated before enforcement changes.,"Values have 6 decimal places, we don't quite understand why, however the instructions we were given with the data set suggest these values should be integer, so we will treat it as the sum.",
 violations.pos,The number of violations accumulated after enforcement changes.,"Values have 6 decimal places, we don't quite understand why, however the instructions we were given with the data set suggest these values should be integer, so we will treat it as the sum.",
 fines.pre,Summed cost of violations.pre adjusted for inflation.,,
 fines.pos,Summed cost of violations.pos adjusted for inflation.,,
-mission,If country has mission in NYC,All values are true.,
-staff,# of employees,,
-spouse,# of spouses, ,
-gov_wage_gdp,,,
-pctmuslim,Percent of country that identifies as Muslim,2 countries have NA's: Bosnia-Herzegovina and Zaire,
-majoritymuslim,Is country majority Muslim,This variable had some values of -1 which occured if and only if pctmuslim was 0.  ,We replaced all -1's with -0's.
-trade,Total trade with the US in 1998 USD,"2 countries have NA's: Bosnia-Herzegovina and Zaire, 1 country shows 0 Libia",
-cars_total,The number of cars owned by both mission and the employees. ,"Total of 1455, 10 NA's",
-cars_personal,Cars owned by staff and spouses of mission,"Total of 740, 10 NA's
+staff,# of mission employees,,
+spouse,# of mission employee spouses, ,
+cars_personal,Cars owned by staff of mission,"Total of 740, 10 NA's
 ",
 cars_mission,Cars owned by mission,"Total of 715, 10 NA's",
-pop1998,Country's population in 1998,,
-gdppcus1998,GDP Percent in USD 1998(?),,
-ecaid,US Economic Assistance grants and loans,,
+cars_total,The number of cars owned by both mission and the employees. ,"Total of 1455, 10 NA's",
+gov_wage_gdp,Percentage of country's GDP paid to all government employees.,,
+gdppcus1998,GDP Per Capita in USD 1998,,
+ecaid,US Economic Aid to Country,,
 milaid,Military Aid,,
-region,7 Geographic regions labelled 1-7,,
-region_name,7 Geographic regions named,,We created this variable using region variable above
-corruption,Country corruption index ,"Min. = -2.58299 (Least corrupt), Max. = 1.58281 (Most corrupt)",
 totaid,milaid + ecaid,,
-r_africa,"Boolean if part of continent. Some countries belong to none, and some others have NA's.",,
-r_middleeast,"""",,
-r_europe,"""",,
-r_southamerica,"""",,
-r_asia,"""",,
-country,country name,"Some missing values, though wbcode are available. ",Missing values were filled using wbcode variable.
-distUNplz,,,
+pctmuslim,Percent of country that identifies as Muslim,2 countries have NA's: Bosnia-Herzegovina and Zaire,
+trade,Total trade with the US in 1998 USD,"2 countries have NA's: Bosnia-Herzegovina and Zaire, 1 country shows 0 Libia",
+region_name,7 Geographic regions,,We created this variable using region variable above
+pop1998,Country's population in 1998,,
+distUNplz,Distance from country's embassy to UN Plaza in Miles,,
+majoritymuslim,Is country majority Muslim,This variable had some values of -1 which occured if and only if pctmuslim was 0.  ,We replaced all -1's with -0's.
+mission,If country has mission in NYC,All values are true.,

@@ -81,6 +81,80 @@ colnames(cor_oneline) =  c("wbcode", "violations.pre",  "violations.pos", "fines
 # Rename FMcorrupt to ensure we don't use it accidentally
 cor_nas = FMcorrupt
 remove(FMcorrupt)
+
+# Variable treatments for analysis
+correlation_matrix_input = cor_oneline[, c("corruption", "violations.pre", "fines.pre", "violations.pos", "fines.pos",
+                                                        "staff", "spouse", "majoritymuslim", "pctmuslim", "trade", "cars_total", "cars_mission", "totaid", "gdppcus1998"
+                                                        )]
+#add log transforms
+#(with the addition of 1 to the log transform to circumvent issues with the 0 values)
+correlation_matrix_input$violations.pos.log = log(correlation_matrix_input$violations.pos+1) 
+correlation_matrix_input$violations.pre.log = log(correlation_matrix_input$violations.pre+1)
+# add violations treated with total cars
+correlation_matrix_input$violations_weighted.cars_total.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$cars_total
+correlation_matrix_input$violations_weighted.cars_total.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$cars_total
+
+#add log transformations
+#The addition of 1 to the normalized number of violations would not be acceptable for predictive or causal modeling, but it
+# will help us circumvent the 0 - 1 log transformation issues while maintaining the sequence of observations within each variable.
+
+correlation_matrix_input$violations_weighted.cars_total.pre.log = log(correlation_matrix_input$violations_weighted.cars_total.pre+1)
+correlation_matrix_input$violations_weighted.cars_total.pos.log = log(correlation_matrix_input$violations_weighted.cars_total.pos+1)
+
+# add violations treated with staff
+correlation_matrix_input$violations_weighted.staff.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$staff
+correlation_matrix_input$violations_weighted.staff.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$staff
+
+# add violations treated with total people (staff + spouse)
+correlation_matrix_input$total_people = correlation_matrix_input$staff + correlation_matrix_input$spouse
+
+correlation_matrix_input$violations_weighted.total_people.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$total_people
+correlation_matrix_input$violations_weighted.total_people.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$total_people
+
+# add violations treated with cars_mission
+correlation_matrix_input$violations_weighted.cars_mission.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$cars_mission
+correlation_matrix_input$violations_weighted.cars_mission.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$cars_mission
+
+
+#add log transformations
+#The addition of 1 to the normalized number of violations would not be acceptable for predictive or causal modeling, but it
+# will help us circumvent the 0 - 1 log transformation issues while maintaining the sequence of observations within each variable.
+
+correlation_matrix_input$violations_weighted.staff.pre.log = log(correlation_matrix_input$violations_weighted.staff.pre+1)
+correlation_matrix_input$violations_weighted.staff.pos.log = log(correlation_matrix_input$violations_weighted.staff.pos+1)
+correlation_matrix_input$violations_weighted.total_people.pre.log = log(correlation_matrix_input$violations_weighted.total_people.pre+1)
+correlation_matrix_input$violations_weighted.total_people.pos.log = log(correlation_matrix_input$violations_weighted.total_people.pos+1)
+correlation_matrix_input$violations_weighted.cars_mission.pre.log = log(correlation_matrix_input$violations_weighted.cars_mission.pre+1)
+correlation_matrix_input$violations_weighted.cars_mission.pos.log = log(correlation_matrix_input$violations_weighted.cars_mission.pos+1)
+
+correlation_matrix_input$totaid.log = log(correlation_matrix_input$totaid + 1)
+
+# Utility functions
+#plot the relationship
+ggplotRegression <- function (fit, title, x, y) {
+  
+  require(ggplot2)
+  
+  ggplot(fit$model, aes_string(x = names(fit$model)[2], y = names(fit$model)[1])) + 
+    geom_point() +
+    stat_smooth(method = "lm", col = "red") +
+    labs(title = title, subtitle = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 3),
+                       "Intercept =",signif(fit$coef[[1]], 3),
+                       " Slope =",signif(fit$coef[[2]], 3),
+                       " P =",signif(summary(fit)$coef[2,4], 3)),
+                        x = x,
+                        y = y)
+}
+
+round_df <- function(x, digits) {
+    # round all numeric variables
+    # x: data frame 
+    # digits: number of digits to round
+    numeric_columns <- sapply(x, mode) == 'numeric'
+    x[numeric_columns] <-  round(x[numeric_columns], digits)
+    x
+}
+
 ```
 
 <!-- INTRODUCTION BEGIN -->
@@ -94,7 +168,7 @@ Prior to 2002 diplomats at UN missions were exampt from parking violations and f
 
 ## Description of Dataset
 
-Our data set has a total of 364 observations. Of the 364, 66 observations contain only economic data leaving NA for our dependent variable, violations. Considering the countries that are among these 66 and the variables for which they have valid data, we suspect these rows result from a merge of economic data with the violations data ($econmic\cup violations$). As such, we believe these 66 countries represent a data artefact from that data merge. As these observations do not contain valid values for key variables, we remove them from our dataset. Of note, those 66 observations appear to contain many which do not even have a mission or staff in New York City, and as such are not relevant for this study on diplomatic parking violations in New York City. Given these considerations, we feel comfortable that we are not biasing the results of the study by removing these observations. With those 66 rows removed, we're left with 298 observations (two observations for each of 149 countries where corruption data exists.) Each country has one observation from prior to the 2002 regulation change and one observation from after. Only the 'violations' and 'fines' variables differ between the two observations for a given country, while other variables remain constant. 
+Our data set has a total of 364 observations. Of the 364, 66 observations contain only economic data leaving NA for our dependent variable, violations. Considering the countries that are among these 66 and the variables for which they have valid data, we suspect these rows result from a merge of economic data with the violations data. As such, we believe these 66 countries represent a data artefact from that data merge. As these observations do not contain valid values for key variables, we remove them from our dataset. Of note, those 66 observations appear to contain many which do not even have a mission or staff in New York City, and as such are not relevant for this study on diplomatic parking violations in New York City. Given these considerations, we feel comfortable that we are not biasing the results of the study by removing these observations. With those 66 rows removed, we're left with 298 observations (two observations for each of 149 countries where corruption data exists.) Each country has one observation from prior to the 2002 regulation change and one observation from after. Only the 'violations' and 'fines' variables differ between the two observations for a given country, while other variables remain constant. 
 
 
 
@@ -117,19 +191,40 @@ Key Variables:
 * trade
 * Region (kinda)
 
-~~There are 66 observations that contain only economic data leaving NA for our dependent variable, violations. Considering the countries that are among these 66 we suspect these rows result from a merge of economic data with the violations data ($econmic\cup violations$) and the economic data set had countries that did not have embasies in Manhattan.  Removing these superfluous observations results in the intersection of the two data sets ($economic\cap violations$), which is what we desire. With those 66 rows removed, we're left with 298 observations (two observations for each of 149 countries where corruption data exists.)~~
+# STILL WORKING ON THIS KH
 
+
+```{r}
+table_means = apply(correlation_matrix_input, 2, mean, na.rm = TRUE)
+table_sums = apply(correlation_matrix_input, 2, sum, na.rm = TRUE)
+table_sd = apply(correlation_matrix_input, 2, sd, na.rm = TRUE)
+table_bind = cbind(table_means, table_sums, table_sd)
+names(table_bind) = c("variable", "mean", "sum", "stddev")
+table_output = table_bind[c("violations.pre", "violations.pos", "violations_weighted.cars_total.pre", "violations_weighted.cars_total.pos", "trade"), ]
+
+
+kable(table_output, "latex", longtable = TRUE, booktabs = TRUE, caption = "Key Variable Summary Data Description") %>%
+  kable_styling(full_width = TRUE, latex_options = c("HOLD_position", "striped", "repeat_header"), row_label_position = 1)   
+
+```
+
+<!--
 Variable         | Mean | Std Dev | Observations 
 -----------------|------|---------|---------------
-violations (log) | ###  | ###     | # of non-NA's 
+violations before enforcement change |`r mean(cor_oneline$violations.pre)`|`r sd(cor_oneline$violations.pre)`|`r sum(!is.na(cor_oneline$violations.pre))` 
+violations after enforcement change |`r mean(cor_oneline$violations.pos)`|`r sd(cor_oneline$violations.pos)`|`r sum(!is.na(cor_oneline$violations.pos))` 
+violations per car before enforcement change |`r mean(correlation_matrix_input$violations_weighted.cars_total.pre, na.rm = TRUE)`|`r sd(correlation_matrix_input$violations_weighted.cars_total.pre, na.rm = TRUE)`|`r sum(!is.na(correlation_matrix_input$violations_weighted.cars_total.pre))` 
+violations per car after enforcement change |`r mean(correlation_matrix_input$violations_weighted.cars_total.pos, na.rm = TRUE)`|`r sd(correlation_matrix_input$violations_weighted.cars_total.pos, na.rm = TRUE)`|`r sum(!is.na(correlation_matrix_input$violations_weighted.cars_total.pos))` 
+Cars per mission |`r mean(cor_oneline$cars_total, na.rm = TRUE)`|`r sd(cor_oneline$cars_total, na.rm = TRUE)`|`r sum(!is.na(cor_oneline$cars_total))` 
 corruption       | ###  | ###     | # of non-NA's 
+trade |`r round(table_means["cars_total"], 2)`|###|###` 
+-->
 ...
 
 * show plots and summary data for key variables
     + Summary table
     + Frequency Distribution
     
-
 ```{r results="asis"}
 # Use CSV version of Google Sheet 'Variable Description for Introduction': https://docs.google.com/spreadsheets/d/1cas_xxfaAY5CNGDAvBqa4ky5b8m61i3qTSgN4LrHT_g/edit#gid=621892365
 variable_description = read.csv("Lab 1 - Variable Descriptions for Introduction.csv", header = TRUE, sep = ",", quote = "\"", allowEscapes = TRUE)
@@ -189,34 +284,22 @@ remove(variable_description)
 ```
 
 
-
-
 ```{r results="asis"}
 
 # This is assuming staff is better than cars, staff+spouse, total_cars.  Though I don't know if that's safe yet.
 
-### Probably makes sense tomove this above
-round_df <- function(x, digits) {
-    # round all numeric variables
-    # x: data frame 
-    # digits: number of digits to round
-    numeric_columns <- sapply(x, mode) == 'numeric'
-    x[numeric_columns] <-  round(x[numeric_columns], digits)
-    x
-}
 
-summary_table_output = cor_oneline[, c("country", "staff", "violations.pre", "violations.pos", "corruption")]
-summary_table_output$mean_violations_per_staff.pre = summary_table_output$violations.pre/summary_table_output$staff
-summary_table_output$mean_violations_per_staff.pos = summary_table_output$violations.pos/summary_table_output$staff
+summary_table_output = cor_oneline[, c("country", "cars_total", "violations.pre", "violations.pos", "corruption")]
+summary_table_output$mean_violations_per_car.pre = summary_table_output$violations.pre/summary_table_output$cars_total
+summary_table_output$mean_violations_per_car.pos = summary_table_output$violations.pos/summary_table_output$cars_total
 
-tmp_rounded = round_df(summary_table_output[, c("country", "mean_violations_per_staff.pre", "mean_violations_per_staff.pos", "corruption")], 2)
-tmp_rounded = tmp_rounded[order(tmp_rounded$mean_violations_per_staff.pre, decreasing = TRUE), ]
-#TODO Sort, Round
+tmp_rounded = round_df(summary_table_output[, c("country", "mean_violations_per_car.pre", "mean_violations_per_car.pos", "corruption")], 2)
+tmp_rounded = tmp_rounded[order(tmp_rounded$mean_violations_per_car.pre, decreasing = TRUE), ]
 
 kable(tmp_rounded[1:20, ], 
       "latex", longtable = TRUE, booktabs = TRUE, 
       caption = "Top 20 Countries by Parking Violations (Key Variables)", 
-      col.names = c("Country", "Mean Violations per Staff Before 2002 Change", "Mean Violations per Staff After 2002 Change", "Corruption Index")) %>%
+      col.names = c("Country", "Mean Violations per Car Before 2002 Change", "Mean Violations per Car After 2002 Change", "Corruption Index")) %>%
   kable_styling(full_width = TRUE, latex_options = c("HOLD_position", "striped", "repeat_header"), row_label_position = 1)   
 
 
@@ -245,9 +328,6 @@ Here we turn to analysis of key relationships among the variables. For the explo
 1) What is the relationship between violations before and after the 2002 introduction of the new parking regulation?
 
 ```{r}
-correlation_matrix_input = cor_oneline[, c("corruption", "violations.pre", "fines.pre", "violations.pos", "fines.pos",
-                                                        "staff", "spouse", "majoritymuslim", "pctmuslim", "trade", "cars_total", "cars_mission", "totaid"
-                                                        )]
 
 p <- ggplot(corrupt, aes(factor(region_name), violations, fill = factor(prepost))) + 
   geom_bar(stat="identity", position = "dodge") +
@@ -259,26 +339,7 @@ This shows us that: There is a dramatic difference between the number of violati
 However, it is difficult to see the rate-of-change relationship between the two variables given their different scales. This relationship can be explored by taking a log transformation of both variables . 
 
 ```{r}
-#add log transforms
-#(with the addition of 1 to the log transform to circumvent issues with the 0 values)
-correlation_matrix_input$violations.pos.log = log(correlation_matrix_input$violations.pos+1) 
-correlation_matrix_input$violations.pre.log = log(correlation_matrix_input$violations.pre+1)
 
-#plot the relationship
-ggplotRegression <- function (fit, title, x, y) {
-  
-  require(ggplot2)
-  
-  ggplot(fit$model, aes_string(x = names(fit$model)[2], y = names(fit$model)[1])) + 
-    geom_point() +
-    stat_smooth(method = "lm", col = "red") +
-    labs(title = title, subtitle = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 5),
-                       "Intercept =",signif(fit$coef[[1]],5 ),
-                       " Slope =",signif(fit$coef[[2]], 5),
-                       " P =",signif(summary(fit)$coef[2,4], 5)),
-                        x = x,
-                        y = y)
-}
 
 lm1 <- lm(violations.pre.log ~ violations.pos.log, data=correlation_matrix_input)
 ggplotRegression(lm1, 'Comparing a Country\'s Violations Pre and Post-Regulation', 'Post-Regulation Log of Violations', 'Pre-Regulation Log of Violations')
@@ -291,16 +352,7 @@ The interpretation of this is that in general countries with higher amounts of v
 However, there is likely much more going on in this data generation process. At this early stage, we speculate that violations is likely related to the size of a mission. This facet was examined through the car-based and the people-based variables. We found that the strongest relationship (consdiering both correlation and slope) between pre- and post-regulation percent changes in violations was for the number of violations normalized for the number of cars. As such, we will be using this during the remainder of our exploration. Should we be beyond the exploration phase into a phase where we were trying to determine causation or to predict violations, this would be insufficient, but given that we are still in exploration phase, it will suffice. Alternate formulations that were explored to control for size (staff members, total people, staff cars) are included in the Appendix. 
 
 ```{r}
-# add violations treated with total cars
-correlation_matrix_input$violations_weighted.cars_total.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$cars_total
-correlation_matrix_input$violations_weighted.cars_total.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$cars_total
 
-#add log transformations
-#The addition of 1 to the normalized number of violations would not be acceptable for predictive or causal modeling, but it
-# will help us circumvent the 0 - 1 log transformation issues while maintaining the sequence of observations within each variable.
-
-correlation_matrix_input$violations_weighted.cars_total.pre.log = log(correlation_matrix_input$violations_weighted.cars_total.pre+1)
-correlation_matrix_input$violations_weighted.cars_total.pos.log = log(correlation_matrix_input$violations_weighted.cars_total.pos+1)
 
 lm5 <- lm(violations_weighted.cars_total.pos.log~violations_weighted.cars_total.pre.log, data=correlation_matrix_input)
 ggplotRegression(lm5,'Comparing a Mission\'s Violations per Car','Pre-Regulation Log of Violations per Car','Post-Regulation Log of Violations per Car')
@@ -348,9 +400,20 @@ TODO:
 * ~~analyze gov_wage_gdp (particular after, when fines are being paid)~~ Correlation changes in step with the gerneral change after the enforcement
 * ~~analyze trade relationship~~ (I will include in gdp and corruption)
 
+During our exploritory data analysis, we revealed three relationships to corruptions that may confound our key relationship analysis.  
+
+## A correlation between a corruption index and that country's Gross Domestic Product Per Capita
+
+```{r}
+lm_cor_gdppc <- lm(gdppcus1998~corruption, data=correlation_matrix_input)
+ggplotRegression(lm_cor_gdppc,'Relationship between corruption and GDP Per Capita','Corruption Index','GDP Per Capita (in 1998 $US)')
+```
+```{r}
+lm_cor_totaid <- lm(totaid.log~corruption, data=correlation_matrix_input)
+ggplotRegression(lm_cor_totaid,'Relationship between corruption and Total Aid Received by US','Corruption Index','Total Aid Received')
+```
 
 Our data set included the percentage of a country's population that identified as Muslim, and that happens to correlate with the number of violations per car.  However, the percentage of Mulsims also correlates with GDP per capita, and GDP per capita has a much stronger correlation to the number of violations per car.  We don't feel any relationships to a single religion is valuable in absense of other major religions, and even then correlations to corruption are not likely to be causal.    
-
 
 
 <!-- BEGIN CONCLUSION -->
@@ -367,31 +430,6 @@ Some poople used to be jerks.  But now they're not. Enforcing fines works on Jer
 From the Analysis of Key Relationships section. We also explored alternate means of controlling for the impact of mission size on the relationship between violations pre and post regulation. These formulations are documented here for the curious reader. 
 
 ```{r}
-# add violations treated with staff
-correlation_matrix_input$violations_weighted.staff.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$staff
-correlation_matrix_input$violations_weighted.staff.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$staff
-
-# add violations treated with total people (staff + spouse)
-correlation_matrix_input$total_people = correlation_matrix_input$staff + correlation_matrix_input$spouse
-
-correlation_matrix_input$violations_weighted.total_people.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$total_people
-correlation_matrix_input$violations_weighted.total_people.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$total_people
-
-# add violations treated with cars_mission
-correlation_matrix_input$violations_weighted.cars_mission.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$cars_mission
-correlation_matrix_input$violations_weighted.cars_mission.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$cars_mission
-
-
-#add log transformations
-#The addition of 1 to the normalized number of violations would not be acceptable for predictive or causal modeling, but it
-# will help us circumvent the 0 - 1 log transformation issues while maintaining the sequence of observations within each variable.
-
-correlation_matrix_input$violations_weighted.staff.pre.log = log(correlation_matrix_input$violations_weighted.staff.pre+1)
-correlation_matrix_input$violations_weighted.staff.pos.log = log(correlation_matrix_input$violations_weighted.staff.pos+1)
-correlation_matrix_input$violations_weighted.total_people.pre.log = log(correlation_matrix_input$violations_weighted.total_people.pre+1)
-correlation_matrix_input$violations_weighted.total_people.pos.log = log(correlation_matrix_input$violations_weighted.total_people.pos+1)
-correlation_matrix_input$violations_weighted.cars_mission.pre.log = log(correlation_matrix_input$violations_weighted.cars_mission.pre+1)
-correlation_matrix_input$violations_weighted.cars_mission.pos.log = log(correlation_matrix_input$violations_weighted.cars_mission.pos+1)
 
 
 lm2 <- lm(violations_weighted.staff.pos.log~violations_weighted.staff.pre.log, data=correlation_matrix_input)
