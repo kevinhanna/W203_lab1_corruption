@@ -298,10 +298,25 @@ From this chart, we can again take away a sense that those countries which had h
 
 Now we turn to understanding how other variables in our data set might help explain the differences in violations per car. We will begin with an examination of the relationship between the provided corruption index and violations per car, with other variables addressed in subsequent sections.
 
+We begin by examining the relationship between pre-regulation # of violations per car and the provided corruption index. 
+
 ```{r}
-
+lm6 <- lm(corruption~violations_weighted.cars_total.pre.log, data=correlation_matrix_input)
+ggplotRegression(lm6,'Relationship between Pre-regulation Violations per Car and Corruption Index','Pre-Regulation Log of Violations per Car','Corruption Index')
 ```
+From this chart, we can see a strong positive relationship between these two variables appears clear, although there is much more going on than is characterized here as the corelationship is notable but far from linear. This chart can be interpreted as - for a 1 unit increase in the country's ranking on this corruption index, we expect to see a 63 percent increase in that country's number of parking violations per car.  
 
+This seems to confirm our initial inclination that corruption may be a good indicator of a country's willingness to incur parking violations. 
+
+Was this relationship changed by the introduction of new parking regulations? 
+
+```{r}
+lm7 <- lm(violations_weighted.cars_total.pos.log~corruption, data=correlation_matrix_input)
+ggplotRegression(lm7,'Relationship between Post-regulation Violations per Car and Corruption Index','Corruption Index','Post-Regulation Log of Violations per Car')
+```
+This chart shows that after the regulation, the positive relationship between a country's corruption index and its willingness to incur parking violations still exists, however it is much weaker and the magnitude much smaller. After the introduction of the parking regulation, we expect a one unit increase in a country's corruption index to result in only an 11 percent increase in parking violations per car. Also of note, the correlation between the two variables decreased markedly, with the relationship seen here clearly positive but non-linear. 
+
+It is also important to note that, while our analysis reveals a positive relationship between a country's corruption index and their willingness to incur parking violations, both before and after the regulation, there are numerous countries with a high corruption index that also incurred 0 parking violations. So, while this relationship may help describe the population, individual countries within the population can and do deviate markedly from the statistical relationship seen above.
 
 <!-- END ANALYSIS OF KEY RELATIONSHIPS --> 
 
