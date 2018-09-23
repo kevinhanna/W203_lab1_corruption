@@ -283,9 +283,19 @@ The interpretation of this is that in general countries with higher amounts of v
 However, there is likely much more going on in this data generation process. At this early stage, we speculate that violations is likely related to the size of a mission. This facet was examined through the car-based and the people-based variables. We found that the strongest relationship (consdiering both correlation and slope) between pre- and post-regulation percent changes in violations was for the number of violations normalized for the number of staff cars. As such, we will be using this during the remainder of our exploration. Should we be beyond the exploration phase into a phase where we were trying to determine causation or to predict violations, this would be insufficient, but given that we are still in exploration phase, it will suffice. Alternate formulations that were explored to control for size (staff members, total people, total cars) are included in the Appendix. 
 
 ```{r}
+#add log transformations
+#The addition of 1 to the normalized number of violations would not be acceptable for predictive or causal modeling, but it
+# will help us circumvent the 0 - 1 log transformation issues while maintaining the sequence of observations within each variable.
+
+correlation_matrix_input$violations_weighted.cars_mission.pre.log = log(correlation_matrix_input$violations_weighted.cars_mission.pre+1)
+correlation_matrix_input$violations_weighted.cars_mission.pos.log = log(correlation_matrix_input$violations_weighted.cars_mission.pos+1)
+
 lm4 <- lm(violations_weighted.cars_mission.pos.log~violations_weighted.cars_mission.pre.log, data=correlation_matrix_input)
 ggplotRegression(lm4,'Comparing a Mission\'s Violations per Staff Car','Pre-Regulation Log of Violations per Staff Car','Post-Regulation Log of Violations per Staff Car')
 ```
+From this chart, we can again take away a sense that those countries which had higher violations prior to the regulations were also likely to have relatively higher violations after the regulation, even after controlling for the conflating impacts by normalizing violations by the most appropriate proxy for the mission size-type variables. 
+
+Now we turn to understanding how other variables in our data set might help explain the differences in violations per car
 
 
 <!-- END ANALYSIS OF KEY RELATIONSHIPS --> 
@@ -319,6 +329,17 @@ Some poople used to be jerks.  But now they're not. Enforcing fines works on Jer
 From the Analysis of Key Relationships section. We also explored alternate means of controlling for the impact of mission size on the relationship between violations pre and post regulation. These formulations are documented here for the curious reader. 
 
 ```{r}
+#add log transformations
+#The addition of 1 to the normalized number of violations would not be acceptable for predictive or causal modeling, but it
+# will help us circumvent the 0 - 1 log transformation issues while maintaining the sequence of observations within each variable.
+
+correlation_matrix_input$violations_weighted.staff.pre.log = log(correlation_matrix_input$violations_weighted.staff.pre+1)
+correlation_matrix_input$violations_weighted.staff.pos.log = log(correlation_matrix_input$violations_weighted.staff.pos+1)
+correlation_matrix_input$violations_weighted.total_people.pre.log = log(correlation_matrix_input$violations_weighted.total_people.pre+1)
+correlation_matrix_input$violations_weighted.total_people.pos.log = log(correlation_matrix_input$violations_weighted.total_people.pos+1)
+correlation_matrix_input$violations_weighted.cars_total.pre.log = log(correlation_matrix_input$violations_weighted.cars_total.pre+1)
+correlation_matrix_input$violations_weighted.cars_total.pos.log = log(correlation_matrix_input$violations_weighted.cars_total.pos+1)
+
 lm2 <- lm(violations_weighted.staff.pos.log~violations_weighted.staff.pre.log, data=correlation_matrix_input)
 ggplotRegression(lm2,'Comparing a Mission\'s Violations per Staff Member','Pre-Regulation Log of Violations per Staff','Post-Regulation Log of Violations per Staff')
 
