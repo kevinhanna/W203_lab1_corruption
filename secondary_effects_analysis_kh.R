@@ -68,3 +68,44 @@ colnames(cor_oneline) =  c("wbcode", "violations.pre",  "violations.pos", "fines
 # Rename FMcorrupt to ensure we don't use it accidentally
 cor_nas = FMcorrupt
 remove(FMcorrupt)
+
+
+names(cor_oneline)
+
+correlation_matrix_input = cor_oneline[, c("corruption", "violations.pre", "fines.pre", "violations.pos", "fines.pos",
+                                           "staff", "spouse", "majoritymuslim", "pctmuslim", "trade", "cars_total", "cars_mission", "totaid", "gov_wage_gdp",  "distUNplz"
+)]
+
+
+#correlation_matrix_input$violations_weighted.total_people.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$total_people
+#correlation_matrix_input$violations_weighted.total_people.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$total_people
+
+correlation_matrix_input$violations_weighted.staff.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$staff
+correlation_matrix_input$violations_weighted.staff.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$staff
+
+ignore = c("fines.pre", "violations.pos", "fines.pos",
+           "spouse", "majoritymuslim", "cars_total", "cars_mission") # this are only part of the treatment (keeping violations for below)
+
+# see what it looks like now.  
+cor_correlations = round(cor(correlation_matrix_input[ , !(names(correlation_matrix_input) %in% ignore)], use = "complete.obs"), 3)
+# Sorting, so strong postive correlations at begining, and negative at end.  
+sort(cor_correlations[,c("corruption")][], decreasing = TRUE)
+
+# There is a strong correlation between staff and trade (.427)
+# correlation wage and corruption
+
+head(subset(corrupt, corrupt$wbcode %in% c("CAN", "NOR")))
+head(subset(cor_nas, cor_nas$wbcode %in% c("CAN", "NOR")))
+head(subset(cor_nas, cor_nas$region  == 1))
+
+par(mfrow = c(3, 2))
+plot(correlation_matrix_input$corruption, correlation_matrix_input$pctmuslim)
+abline(lm(correlation_matrix_input$corruption ~ correlation_matrix_input$pctmuslim), col="blue")
+plot(correlation_matrix_input$corruption, correlation_matrix_input$violations_weighted.staff.pos)
+abline(lm(correlation_matrix_input$corruption ~ correlation_matrix_input$violations_weighted.staff.pos), col="red")
+plot(correlation_matrix_input$corruption, correlation_matrix_input$violations_weighted.total_people.pre)
+abline(lm(correlation_matrix_input$corruption ~ correlation_matrix_input$violations_weighted.total_people.pre), col="blue")
+plot(correlation_matrix_input$corruption, correlation_matrix_input$violations_weighted.total_people.pos)
+abline(lm(correlation_matrix_input$corruption ~ correlation_matrix_input$violations_weighted.total_people.pos), col="red")
+plot(correlation_matrix_input$corruption, correlation_matrix_input$trade)
+plot(1,1)
