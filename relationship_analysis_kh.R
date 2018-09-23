@@ -1,7 +1,7 @@
 setwd("C:/Users/kevin/OneDrive/School/MIDS/W203 - Statistics for Data Science/Lab 1/W203_lab1_corruption")
 #library(car)
 #library(grid)
-#library(ggplot2)
+library(ggplot2)
 
 load("Corrupt.Rdata")
 
@@ -131,8 +131,16 @@ cor_correlations = round(cor(correlation_matrix_input[ , !(names(correlation_mat
 # Sorting, so strong postive correlations at begining, and negative at end.  
 sort(cor_correlations[,c("corruption")][], decreasing = TRUE)
 
-#cor_key_variables = subset(cor_oneline, c("corruption", "staff", ))
-  
+
+## Change in mean violations
+#correlation_matrix_input$corruption_change = (correlation_matrix_input$violations_weighted.staff.pos)/(correlation_matrix_input$violations_weighted.staff.pre)
+#round(correlation_matrix_input[, c("corruption_change", "violations_weighted.staff.pre", "violations_weighted.staff.pos")], 3)
+
+#cor_correlations = round(cor(correlation_matrix_input[ , !(names(correlation_matrix_input) %in% ignore)], use = "complete.obs"), 3)
+# Sorting, so strong postive correlations at begining, and negative at end.  
+#sort(cor_correlations[,c("corruption")][], decreasing = TRUE)
+
+
 par(mfrow = c(3, 2))
 plot(correlation_matrix_input$corruption, correlation_matrix_input$violations_weighted.staff.pre)
 abline(lm(correlation_matrix_input$corruption ~ correlation_matrix_input$violations_weighted.staff.pre), col="blue")
@@ -176,6 +184,8 @@ barplot(c(mean(correlation_matrix_input$violations_weighted.staff.pre), mean(cor
         , xlab = "Mean Parking Tickets for Mission Staff", col=c("darkblue", "red"),
         legend = c("Before Enforcement Change", "After Enforcement Change")
         )
+
+# Add bar graph of buckers of corrupttoin (eg: max - min / 5)
 
 #        , main="Car Distribution by Gears and VS",
 #        xlab="Number of Gears", col=c("darkblue","red"),
