@@ -283,6 +283,10 @@ The interpretation of this is that in general countries with higher amounts of v
 However, there is likely much more going on in this data generation process. At this early stage, we speculate that violations is likely related to the size of a mission. This facet was examined through the car-based and the people-based variables. We found that the strongest relationship (consdiering both correlation and slope) between pre- and post-regulation percent changes in violations was for the number of violations normalized for the number of cars. As such, we will be using this during the remainder of our exploration. Should we be beyond the exploration phase into a phase where we were trying to determine causation or to predict violations, this would be insufficient, but given that we are still in exploration phase, it will suffice. Alternate formulations that were explored to control for size (staff members, total people, staff cars) are included in the Appendix. 
 
 ```{r}
+# add violations treated with total cars
+correlation_matrix_input$violations_weighted.cars_total.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$cars_total
+correlation_matrix_input$violations_weighted.cars_total.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$cars_total
+
 #add log transformations
 #The addition of 1 to the normalized number of violations would not be acceptable for predictive or causal modeling, but it
 # will help us circumvent the 0 - 1 log transformation issues while maintaining the sequence of observations within each variable.
@@ -349,6 +353,21 @@ Some poople used to be jerks.  But now they're not. Enforcing fines works on Jer
 From the Analysis of Key Relationships section. We also explored alternate means of controlling for the impact of mission size on the relationship between violations pre and post regulation. These formulations are documented here for the curious reader. 
 
 ```{r}
+# add violations treated with staff
+correlation_matrix_input$violations_weighted.staff.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$staff
+correlation_matrix_input$violations_weighted.staff.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$staff
+
+# add violations treated with total people (staff + spouse)
+correlation_matrix_input$total_people = correlation_matrix_input$staff + correlation_matrix_input$spouse
+
+correlation_matrix_input$violations_weighted.total_people.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$total_people
+correlation_matrix_input$violations_weighted.total_people.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$total_people
+
+# add violations treated with cars_mission
+correlation_matrix_input$violations_weighted.cars_mission.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$cars_mission
+correlation_matrix_input$violations_weighted.cars_mission.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$cars_mission
+
+
 #add log transformations
 #The addition of 1 to the normalized number of violations would not be acceptable for predictive or causal modeling, but it
 # will help us circumvent the 0 - 1 log transformation issues while maintaining the sequence of observations within each variable.
