@@ -280,7 +280,12 @@ This plot roughly shows that for a 1 percent increase in the number of violation
 
 The interpretation of this is that in general countries with higher amounts of violations before the regulation are likely to also have relatively higher amounts of violations after. 
 
-However, there is likely much more going on in this data generation process. At this early stage, we speculate that violations is likely related to the size of a mission. This facet will be examined through the total_cars and the total_people variables. We will also address some of the other variables seen in the dataset. 
+However, there is likely much more going on in this data generation process. At this early stage, we speculate that violations is likely related to the size of a mission. This facet was examined through the car-based and the people-based variables. We found that the strongest relationship (consdiering both correlation and slope) between pre- and post-regulation percent changes in violations was for the number of violations normalized for the number of staff cars. As such, we will be using this during the remainder of our exploration. Should we be beyond the exploration phase into a phase where we were trying to determine causation or to predict violations, this would be insufficient, but given that we are still in exploration phase, it will suffice. Alternate formulations that were explored to control for size (staff members, total people, total cars) are included in the Appendix. 
+
+```{r}
+lm4 <- lm(violations_weighted.cars_mission.pos.log~violations_weighted.cars_mission.pre.log, data=correlation_matrix_input)
+ggplotRegression(lm4,'Comparing a Mission\'s Violations per Staff Car','Pre-Regulation Log of Violations per Staff Car','Post-Regulation Log of Violations per Staff Car')
+```
 
 
 <!-- END ANALYSIS OF KEY RELATIONSHIPS --> 
@@ -308,3 +313,18 @@ Summarize your exploratory analysis. What can you conclude based on your analysi
 # Conclusion
 Some poople used to be jerks.  But now they're not. Enforcing fines works on Jerks.  Canadian's are not jerks (bias: author: Hanna, is a Canadian)
 <!-- END CONCLUSION -->
+
+# Appendix
+
+From the Analysis of Key Relationships section. We also explored alternate means of controlling for the impact of mission size on the relationship between violations pre and post regulation. These formulations are documented here for the curious reader. 
+
+```{r}
+lm2 <- lm(violations_weighted.staff.pos.log~violations_weighted.staff.pre.log, data=correlation_matrix_input)
+ggplotRegression(lm2,'Comparing a Mission\'s Violations per Staff Member','Pre-Regulation Log of Violations per Staff','Post-Regulation Log of Violations per Staff')
+
+lm3 <- lm(violations_weighted.total_people.pos.log~violations_weighted.total_people.pre.log, data=correlation_matrix_input)
+ggplotRegression(lm3,'Comparing a Mission\'s Violations per Person','Pre-Regulation Log of Violations per Person','Post-Regulation Log of Violations per Person')
+
+lm5 <- lm(violations_weighted.cars_total.pos.log~violations_weighted.cars_total.pre.log, data=correlation_matrix_input)
+ggplotRegression(lm5,'Comparing a Mission\'s Violations per Car','Pre-Regulation Log of Violations per Car','Post-Regulation Log of Violations per Car')
+```
