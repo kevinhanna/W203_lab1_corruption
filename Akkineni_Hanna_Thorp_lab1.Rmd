@@ -232,6 +232,53 @@ transformation you use.
 -->
 # Analysis of Key Relationships
 
+Here we turn to analysis of key relationships among the variables. For the exploratory phase, we are interested in determining which of the variables are correlated, and if so, how strongly. For this analysis, where applicable, and based on the discussion in the Univariate section above, we use the log transformation of variables, as opposed to the untransformed version of the variable(s). This helps improve our understanding of relationships as positive skew that is present in some of the variables is compressed. 
+
+1) What is the relationship between violations before and after the 2002 introduction of the new parking regulation?
+
+```{r}
+p <- ggplot(corrupt, aes(factor(region_name), violations, fill = factor(prepost))) + 
+  geom_bar(stat="identity", position = "dodge") +
+  scale_fill_brewer(palette = "Set1")
+p + labs(title = 'The Number of Violations per Region', subtitle = 'Before and After 2002 Parking Regulation', x = 'Region', y = '# of Violations', fill='Before or After 2002 Regulation')
+```
+This shows us that: There is a dramatic difference between the number of violations before and after the 2002 regulation for all regions. (Regions are used here as an expedient bucketing method across the observations to reduce complexity. This is useful for explanation, though not necessarily useful for model-building.)  
+
+However, it is difficult to see the rate-of-change relationship between the two variables given their different scales. This relationship can be explored by taking a log transformation of both variables . 
+
+```{r}
+#add log transforms
+#(with the addition of 1 to the log transform to circumvent issues with the 0 values)
+correlation_matrix_input$violations.pos.log = log(correlation_matrix_input$violations.pos+1) 
+correlation_matrix_input$violations.pre.log = log(correlation_matrix_input$violations.pre+1)
+
+#plot the relationship
+ggplotRegression <- function (fit, title, x, y) {
+  
+  require(ggplot2)
+  
+  ggplot(fit$model, aes_string(x = names(fit$model)[2], y = names(fit$model)[1])) + 
+    geom_point() +
+    stat_smooth(method = "lm", col = "red") +
+    labs(title = title, subtitle = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 5),
+                       "Intercept =",signif(fit$coef[[1]],5 ),
+                       " Slope =",signif(fit$coef[[2]], 5),
+                       " P =",signif(summary(fit)$coef[2,4], 5)),
+                        x = x,
+                        y = y)
+}
+
+lm1 <- lm(violations.pre.log ~ violations.pos.log, data=correlation_matrix_input)
+ggplotRegression(lm1, 'Comparing a Country\'s Violations Pre and Post-Regulation', 'Post-Regulation Log of Violations', 'Pre-Regulation Log of Violations')
+
+```
+This plot roughly shows that for a 1 percent increase in the number of violations before the regulation, the data reveals a roughly 0.24 percent increase in the number of violations seen after the regulation. At this exploratory stage, there are two important facets to takeaway: 1) The correlation between these two series at 0.33 is notable, 2) The relationship between the two variables is clearly positive. 
+
+The interpretation of this is that in general countries with higher amounts of violations before the regulation are likely to also have relatively higher amounts of violations after. 
+
+However, there is likely much more going on in this data generation process. At this early stage, we speculate that violations is likely related to the size of a mission. This facet will be examined through the total_cars and the total_people variables. We will also address some of the other variables seen in the dataset. 
+
+
 <!-- END ANALYSIS OF KEY RELATIONSHIPS --> 
 
 <!-- START ANALYSIS OF SECONDARY EFFECTS --> 
