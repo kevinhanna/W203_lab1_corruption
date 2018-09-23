@@ -12,7 +12,7 @@ output:
 setwd("C:/Users/kevin/OneDrive/School/MIDS/W203 - Statistics for Data Science/Lab 1/W203_lab1_corruption")
 #library(car)
 #library(grid)
-#library(ggplot2)
+library(ggplot2)
 library(knitr)
 library(kableExtra)
 
@@ -237,6 +237,10 @@ Here we turn to analysis of key relationships among the variables. For the explo
 1) What is the relationship between violations before and after the 2002 introduction of the new parking regulation?
 
 ```{r}
+correlation_matrix_input = cor_oneline[, c("corruption", "violations.pre", "fines.pre", "violations.pos", "fines.pos",
+                                                        "staff", "spouse", "majoritymuslim", "pctmuslim", "trade", "cars_total", "cars_mission", "totaid"
+                                                        )]
+
 p <- ggplot(corrupt, aes(factor(region_name), violations, fill = factor(prepost))) + 
   geom_bar(stat="identity", position = "dodge") +
   scale_fill_brewer(palette = "Set1")
