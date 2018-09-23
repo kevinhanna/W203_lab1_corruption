@@ -69,7 +69,22 @@ colnames(cor_oneline) =  c("wbcode", "violations.pre",  "violations.pos", "fines
 cor_nas = FMcorrupt
 remove(FMcorrupt)
 
-
+# Functions
+#plot the relationship
+ggplotRegression <- function (fit, title, x, y) {
+  
+  require(ggplot2)
+  
+  ggplot(fit$model, aes_string(x = names(fit$model)[2], y = names(fit$model)[1])) + 
+    geom_point() +
+    stat_smooth(method = "lm", col = "red") +
+    labs(title = title, subtitle = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 5),
+                                         "Intercept =",signif(fit$coef[[1]],5 ),
+                                         " Slope =",signif(fit$coef[[2]], 5),
+                                         " P =",signif(summary(fit)$coef[2,4], 5)),
+         x = x,
+         y = y)
+}
 names(cor_oneline)
 
 correlation_matrix_input = cor_oneline[, c("corruption", "violations.pre", "fines.pre", "violations.pos", "fines.pos",
@@ -80,8 +95,14 @@ correlation_matrix_input = cor_oneline[, c("corruption", "violations.pre", "fine
 #correlation_matrix_input$violations_weighted.total_people.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$total_people
 #correlation_matrix_input$violations_weighted.total_people.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$total_people
 
-correlation_matrix_input$violations_weighted.staff.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$staff
-correlation_matrix_input$violations_weighted.staff.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$staff
+# add violations treated with cars_mission
+correlation_matrix_input$violations_weighted.cars_mission.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$cars_mission
+correlation_matrix_input$violations_weighted.cars_mission.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$cars_mission
+
+# add violations treated with staff
+#correlation_matrix_input$violations_weighted.staff.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$staff
+#correlation_matrix_input$violations_weighted.staff.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$staff
+
 
 ignore = c("fines.pre", "violations.pos", "fines.pos",
            "spouse", "majoritymuslim", "cars_total", "cars_mission") # this are only part of the treatment (keeping violations for below)
@@ -114,6 +135,15 @@ plot(1,1)
 
 # Investigate the relationships between wage, gdp pc and corruption.
 
-scatterplotMatrix( ~ corruption + gov_wage_gdp + gdppcus1998 + staff + totaid, data = corrupt,
-                   main = "Scatterplot Matrix for Regions Before 2002", na.rm = TRUE)
+scatterplotMatrix( ~ corruption + gov_wage_gdp + gdppcus1998 + totaid, data = correlation_matrix_input,
+                   var.labels = c("Corruption Index", "GDP Per. Capita", "Gvmnt Wage % of GDP", "Total US Aid Received"),
+                   main = "Relationship of Economic Factors to Corruption", na.rm = TRUE)
+
+
+lm5 <- lm(gdppcus1998~corruption, data=correlation_matrix_input)
+ggplotRegression(lm5,'Relationship between corruption and GDP Per Capita','Corruption Index','GDP Per Capita (in 1998 $US)')
+
+correlation_matrix_input$totaid.log = log(correlation_matrix_input$totaid + 1)
+lm5 <- lm(totaid.log~corruption, data=correlation_matrix_input)
+ggplotRegression(lm5,'Relationship between corruption and GDP Per Capita','Corruption Index','GDP Per Capita (in 1998 $US)')
 
