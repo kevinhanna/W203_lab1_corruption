@@ -35,6 +35,8 @@ FMcorrupt[FMcorrupt$wbcode == "PAN", "country"] = "PANAMA"
 FMcorrupt[FMcorrupt$wbcode == "SWE", "country"] = "SWEDEN"
 FMcorrupt[FMcorrupt$wbcode == "TUR", "country"] = "TURKEY"
 
+#TODO: For some reason Canada ends up in Caribbean after doing the below.  See if there are any others, Fix and note in Univariate analysis
+
 # Create named regions variable using region
 FMcorrupt$region_name = NA
 FMcorrupt[FMcorrupt$region == 1 & ! is.na(FMcorrupt$region), "region_name"] = "Caribbean"
@@ -112,15 +114,15 @@ Key Variables:
 * violations
 * corruption
 * car_total
-* trade (maybe?)
-* distUNplz
+* trade
 * Region (kinda)
 
 ~~There are 66 observations that contain only economic data leaving NA for our dependent variable, violations. Considering the countries that are among these 66 we suspect these rows result from a merge of economic data with the violations data ($econmic\cup violations$) and the economic data set had countries that did not have embasies in Manhattan.  Removing these superfluous observations results in the intersection of the two data sets ($economic\cap violations$), which is what we desire. With those 66 rows removed, we're left with 298 observations (two observations for each of 149 countries where corruption data exists.)~~
 
-Variable | Mean | Std Dev 
----------|------|--------
-violations (log) | ### | ###
+Variable         | Mean | Std Dev | Observations 
+-----------------|------|---------|---------------
+violations (log) | ###  | ###     | # of non-NA's 
+corruption       | ###  | ###     | # of non-NA's 
 ...
 
 * show plots and summary data for key variables
@@ -338,12 +340,18 @@ how these variables affect your understanding of the data.
 -->
 # Analysis of Secondary Effects
 <!-- END ANALYSIS OF SECONDARY EFFECTS --> 
+Plan:
 
-* show that pctmuslim doesn't have much relevance
-* analyze trade relationship
-* analyze gov_wage_gdp (particular after, when fines are being paid)
-    + Countries with higher violations + higher corruption index might be low gov_wage_gdp (might also mean small governemnt, so population might also be a factor)
-* does region have any *meaningful* relationship to violations?
+* the relationships between gov wage, gdp per capita and corruption
+    + Countries with higher violations + higher corruption index might be low gov_wage_gdp or low GDP pc
+    + GDP PC relates with trade, making the correlation between gdp and corruption and vilations a little merky still.
+* ~analyze gov_wage_gdp (particular after, when fines are being paid)~ Correlation changes in step with the gerneral change after the enforcement
+* ~analyze trade relationship~ (I will include in gdp and corruption)
+
+
+Our data set included the percentage of a country's population that identified as Muslim, and that happens to correlate with the number of violations per car.  However, the percentage of Mulsims also correlates with GDP per capita, and GDP per capita has a much stronger correlation to the number of violations per car.  We don't feel any relationships to a single religion is valuable in absense of other major religions, and even then correlations to corruption are not likely to be causal.    
+
+
 
 <!-- BEGIN CONCLUSION -->
 <!--
@@ -397,3 +405,6 @@ ggplotRegression(lm4,'Comparing a Mission\'s Violations per Staff Car','Pre-Regu
 
 ```
 It makes sense that the set of normalizations which best preserved signal from violations normalized by size-type variables was the total cars variable. The three other formulations above are potential substitutes, but appear to preserve less of the signal than the total cars formulation. As mentioned above, it makes intuitive sense for the cars variables to carry more signal than the number of staff variables as only cars can incur parking violations. Also, we considered using the number of violations per staff car variable as it also appear to preserve signal well, however the normalization method used here (violations divided by staff car) is compromised where staff cars == 0, as is the case for four observations. 
+
+TODO: Describe unexplained change in correlation betwen total aid and violations/car
+TODO: Note that distance from US showed no relationship()
