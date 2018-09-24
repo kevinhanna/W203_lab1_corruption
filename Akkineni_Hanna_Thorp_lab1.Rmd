@@ -6,7 +6,9 @@ output:
   pdf_document: default
 ---
 
-
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
 ```{r}
 setwd("C:/Users/kevin/OneDrive/School/MIDS/W203 - Statistics for Data Science/Lab 1/W203_lab1_corruption")
@@ -419,7 +421,7 @@ how these variables affect your understanding of the data.
 
 # Analysis of Secondary Effects
 <!-- END ANALYSIS OF SECONDARY EFFECTS --> 
-During our exploritory data analysis, we revealed three relationships to corruptions that may confound our key relationship analysis.  
+During our exploritory data analysis, we revealed some relationships to corruptions that may confound our key relationship analysis.  
 
 ## Relationship Between Corruption Index and That Country's Gross Domestic Product Per Capita
 
@@ -428,7 +430,9 @@ lm_cor_gdppc <- lm(gdppcus1998~corruption, data=correlation_matrix_input)
 ggplotRegression(lm_cor_gdppc,'Relationship between corruption and GDP Per Capita','Corruption Index','GDP Per Capita (in 1998 $US)')
 ```
 
-TODO: Explain how this ties in to key relationship
+The plot above shows the steep negative relationship of GDP per capita and corrution.  This is relevant to the key relationship between violations/total cars and corruption as GPD per capita might possitively corelate to the personal wealth of mission employees and wealth might also contribute to a person's decision to pay parking tickets.  
+
+It is worth noting that the variable gov_wage_gdp which is the percentage of a country's GDP paid to government employees was analyzed by multiplying it to GDP per capita.  The correlation was weaker, however 57 of the 149 countries being analyzed are missing values for gov_wage_gdp, and we have no insights that would provide confidence that wages of mission employees changes in any predictable manner with gov_wage_gdp.
 
 ## Relationship Between Corruption Index and The Amount of Aid Recieved by the US
 ```{r}
@@ -436,10 +440,10 @@ lm_cor_totaid <- lm(totaid.log~corruption, data=correlation_matrix_input)
 ggplotRegression(lm_cor_totaid,'Relationship between corruption and Total Aid Received by US (log)','Corruption Index','Total Aid Received')
 ```
 
-TODO: Explain how this ties in to key relationship
+Total aid, which we assume is sum of an index (not dollars) of military and economic aid provided to the country by the U.S. is also correlated to corruption. In our analysis we noticed that the correlation between total aid and the violations changed from 0.44 to -0.06.  We investigated further and found there was another change in parking ticket payment enforcement made around the same time; unpaid parking could be deducted from aid provided to the country which may explain some of the change in the number violations at this time. Having made assumptions about the total aid variable we are only able to suggest their might be a confounding effect caused by aid.
 
 ## Percentage of Country Who Identify as Muslim
-Our data set included the percentage of a country's population that identified as Muslim, and that happens to correlate with the number of violations per car.  However, the percentage of Mulsims also correlates with GDP per capita, and GDP per capita has a much stronger correlation to the number of violations per car.  We don't feel any relationships to a single religion is valuable in absense of other major religions, and even then correlations to corruption are not likely to be causal.    
+Our data set included the percentage of a country's population that identified as Muslim, and that happens to correlate with the number of violations per car.  However, the percentage of Mulsims also correlates with GDP per capita, and GDP per capita has a much stronger correlation to the number of violations per car.  We don't feel any relationships to a single religion is valuable in absense of other major religions having different correlations with independent variables.    
 
 ## Trade Between Countries and the US.
 Trade is positively correlated with the number of mission staff and spouses.  It seems the more trade there is between a country and the US, the more staff (and cars) there are at the mission in NYC.  The number of cars at the mission it turns out acts as a proxy variable for trade, and it is more relevant to our analysis as it can be used to find the mean violations.  Therefore, we have not included analysis on trade. 
@@ -450,6 +454,10 @@ Conclusion (20 pts)
 Summarize your exploratory analysis. What can you conclude based on your analysis?
 -->
 # Conclusion
+
+* Total number of parking tickets dropped after regulation change.
+* The counrties who had the most tickets before had the most after
+* The slope of violations/cars & corrution flattened out after reg showing the fines had more impact on corrupt countries. 
 
 <!-- END CONCLUSION -->
 
@@ -471,6 +479,3 @@ ggplotRegression(lm4,'Comparing a Mission\'s Violations per Staff Car','Pre-Regu
 
 ```
 It makes sense that the set of normalizations which best preserved signal from violations normalized by size-type variables was the total cars variable. The three other formulations above are potential substitutes, but appear to preserve less of the signal than the total cars formulation. As mentioned above, it makes intuitive sense for the cars variables to carry more signal than the number of staff variables as only cars can incur parking violations. Also, we considered using the number of violations per staff car variable as it also appear to preserve signal well, however the normalization method used here (violations divided by staff car) is compromised where staff cars == 0, as is the case for four observations. 
-
-TODO: Describe unexplained change in correlation betwen total aid and violations/car  
-TODO: Note that distance from US showed no relationship  
