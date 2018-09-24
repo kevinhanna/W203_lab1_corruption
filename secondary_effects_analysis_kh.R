@@ -1,5 +1,5 @@
 setwd("C:/Users/kevin/OneDrive/School/MIDS/W203 - Statistics for Data Science/Lab 1/W203_lab1_corruption")
-#library(car)
+library(car)
 #library(grid)
 #library(ggplot2)
 library(knitr)
@@ -88,7 +88,7 @@ ggplotRegression <- function (fit, title, x, y) {
 names(cor_oneline)
 
 correlation_matrix_input = cor_oneline[, c("corruption", "violations.pre", "fines.pre", "violations.pos", "fines.pos",
-                                           "staff", "spouse", "majoritymuslim", "pctmuslim", "trade", "cars_total", "cars_mission", "totaid", "gov_wage_gdp",  "distUNplz"
+                                           "staff", "spouse", "majoritymuslim", "pctmuslim", "trade", "cars_total", "cars_mission", "totaid", "gov_wage_gdp",  "distUNplz", "gov_wage_gdp", "gdppcus1998"
 )]
 
 
@@ -99,9 +99,13 @@ correlation_matrix_input = cor_oneline[, c("corruption", "violations.pre", "fine
 correlation_matrix_input$violations_weighted.cars_mission.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$cars_mission
 correlation_matrix_input$violations_weighted.cars_mission.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$cars_mission
 
+# add violations treated with total_cars
+correlation_matrix_input$violations_weighted.cars_total.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$cars_total
+correlation_matrix_input$violations_weighted.cars_total.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$cars_total
+
 # add violations treated with staff
-#correlation_matrix_input$violations_weighted.staff.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$staff
-#correlation_matrix_input$violations_weighted.staff.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$staff
+correlation_matrix_input$violations_weighted.staff.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$staff
+correlation_matrix_input$violations_weighted.staff.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$staff
 
 
 ignore = c("fines.pre", "violations.pos", "fines.pos",
@@ -130,7 +134,6 @@ plot(correlation_matrix_input$corruption, correlation_matrix_input$violations_we
 abline(lm(correlation_matrix_input$corruption ~ correlation_matrix_input$violations_weighted.total_people.pos), col="red")
 plot(correlation_matrix_input$corruption, correlation_matrix_input$trade)
 plot(1,1)
-<<<<<<< HEAD
 
 
 # Investigate the relationships between wage, gdp pc and corruption.
@@ -147,5 +150,44 @@ correlation_matrix_input$totaid.log = log(correlation_matrix_input$totaid + 1)
 lm5 <- lm(totaid.log~corruption, data=correlation_matrix_input)
 ggplotRegression(lm5,'Relationship between corruption and GDP Per Capita','Corruption Index','GDP Per Capita (in 1998 $US)')
 
-=======
->>>>>>> parent of 5d0649f... Added some secondary effect plots
+"""
+Key Variables:
+  
+  * violations
+* corruption
+* car_total
+* trade
+
+"""
+par(mfrow = c(1, 2))
+hist(correlation_matrix_input$corruption, col="darkblue")
+boxplot(correlation_matrix_input$corruption, col = "darkblue")
+
+par(mfrow = c(1, 3))
+hist(correlation_matrix_input$cars_total, col="darkblue")
+boxplot(correlation_matrix_input$cars_total, col = "darkblue")
+boxplot(correlation_matrix_input$cars_total/correlation_matrix_input$staff, col = "darkblue")
+
+par(mfrow = c(1, 2))
+hist(correlation_matrix_input$trade/10**6, col="darkblue")
+boxplot(correlation_matrix_input$trade/10**6, col = "darkblue")
+
+scatterplotMatrix( ~ corruption + gov_wage_gdp + gdppcus1998 + totaid, data = correlation_matrix_input,
+                   var.labels = c("Corruption Index", "GDP Per. Capita", "Gvmnt Wage % of GDP", "Total US Aid Received"),
+                   main = "Relationship of Economic Factors to Corruption", na.rm = TRUE)
+
+scatterplotMatrix( ~ corruption + violations_weighted.cars_total.pre + violations_weighted.staff.pre, data = correlation_matrix_input,
+                   #var.labels = c("Corruption Index", "GDP Per. Capita", "Gvmnt Wage % of GDP", "Total US Aid Received"),
+                   main = "Relationship of Economic Factors to Corruption", na.rm = TRUE)
+
+# Reset default back to 1x1
+par(mfrow = c(1, 1))
+
+median(correlation_matrix_input$corruption)
+
+cor_oneline[, c("region", "region_name", "country")]
+
+p <- ggplot(corrupt, aes(factor(region_name), violations, fill = factor(prepost))) + 
+  geom_bar(stat="identity", position = "dodge") +
+  scale_fill_brewer(palette = "Set1")
+p + labs(title = 'The Number of Violations per Region', subtitle = 'Before and After 2002 Parking Regulation', x = 'Region', y = '# of Violations', fill='Before or After 2002 Regulation')
