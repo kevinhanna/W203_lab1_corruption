@@ -186,7 +186,7 @@ may be appropriate for each variable.
 -->
 # Univariate Analysis of Key Variables
 
-We start our exploratory analysis with a high level look at all our variables. 
+We start our exploratory analysis with a high level look at all our variables to better understand what our variables represent and find & correct quality problems. 
 
 ## High Level Univariate Analysis
 
@@ -222,34 +222,27 @@ remove(tmp_table_means, tmp_table_sums, tmp_table_sd, tmp_table_bind, tmp_table_
 TODO: Round the values above
 
 ### Corruption
+
+
 ```{r}
 par(mfrow = c(1, 2))
-hist(correlation_matrix_input$corruption, col="blue")
-boxplot(correlation_matrix_input$corruption, col = "blue")
+hist(correlation_matrix_input$corruption, col="blue", main = "Corruption Frequency Dist.", xlab = "Corruption Index")
+boxplot(correlation_matrix_input$corruption, col = "blue", ylab = "Corruption Index")
 ```
 
-TODO:
-
-* Anomalies?
-* coding issues? 
-* erroneous values? how were they fixed/dealt with?
-* Transformation? Why?
+We don't fully understand the corruption variable other than to say it appears to be an index. The frequency distribution skews negative, however the median (`r round(median(correlation_matrix_input$corruption),2)`) is pretty close to 0 which suggests the values might be deliberately scaled to balance around 0, so we will not apply any treatments to corruption.  The outliers in the boxplot are expected with this skew.
 
 
-### Cars (cars/staff)
+### Total Cars for Each Mission
 ```{r}
 par(mfrow = c(1, 3))
-hist(correlation_matrix_input$cars_total, col="blue")
-boxplot(correlation_matrix_input$cars_total, col = "blue")
-boxplot(correlation_matrix_input$cars_total/correlation_matrix_input$staff, col = "blue")
+hist(correlation_matrix_input$cars_total, col="blue", xlab = "Total Cars", main = "Cars Freq. Dist.")
+boxplot(correlation_matrix_input$cars_total, col = "blue", ylab = "Total Cars")
+boxplot(correlation_matrix_input$cars_total/(correlation_matrix_input$staff + correlation_matrix_input$spouse), col = "blue", ylab="Total Cars/Staff")
 
 ```
-TODO:
 
-* Anomalies?
-* coding issues? 
-* erroneous values? how were they fixed/dealt with?
-* Transformation? Why?
+Looking at the histogram on the left we see the vast majority of missions have 0 to 10 cars, which is unsuprising as are the ouliers seeing as some missions have a lot of staff.  We test this by dividing the total number of cars by the the number of staff and spouses.  This is displayed in the boxplot on the right, there are still some outliers however, the maximum is 2.6, and that could be explained by the absence of children in our dataset.  The frequency is skewed negative, but this variable will be used to treat violations and we'll apply the treatment to that combination. 
 
 ### Trade
 ```{r}
