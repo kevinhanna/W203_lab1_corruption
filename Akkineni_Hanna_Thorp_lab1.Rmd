@@ -1,6 +1,6 @@
 ---
 title: "Corruption and Parking Violations"
-author: "Akkineni, Hanna, Thorp"
+author: "C. Akkineni, K. Hanna, A. Thorp"
 date: "September 26, 2016"
 output:
   pdf_document: default
@@ -22,6 +22,7 @@ load("Corrupt.Rdata")
 #Fix majoritymulsim where value = -1, should be 0
 FMcorrupt[FMcorrupt$majoritymuslim == -1 & ! is.na(FMcorrupt$majoritymuslim), "majoritymuslim"] = 0
 
+
 # Add missing counties.  Reference: https://www.worldatlas.com/aatlas/ctycodes.htm
 FMcorrupt[FMcorrupt$wbcode == "ARE", "country"] = "UNITED ARAB EMIRATES"
 FMcorrupt[FMcorrupt$wbcode == "CAF", "country"] = "CENTRAL AFRICAN REPUBLIC"
@@ -35,11 +36,13 @@ FMcorrupt[FMcorrupt$wbcode == "PAN", "country"] = "PANAMA"
 FMcorrupt[FMcorrupt$wbcode == "SWE", "country"] = "SWEDEN"
 FMcorrupt[FMcorrupt$wbcode == "TUR", "country"] = "TURKEY"
 
-#TODO: For some reason Canada ends up in Caribbean after doing the below.  See if there are any others, Fix and note in Univariate analysis
+# Mexicod is part of NORTH America, not SOUTH America
+FMcorrupt[FMcorrupt$wbcode == "MEX", "region"] = 1
+
 
 # Create named regions variable using region
 FMcorrupt$region_name = NA
-FMcorrupt[FMcorrupt$region == 1 & ! is.na(FMcorrupt$region), "region_name"] = "Caribbean"
+FMcorrupt[FMcorrupt$region == 1 & ! is.na(FMcorrupt$region), "region_name"] = "North America"
 FMcorrupt[FMcorrupt$region == 2 & ! is.na(FMcorrupt$region), "region_name"] = "South America"
 FMcorrupt[FMcorrupt$region == 3 & ! is.na(FMcorrupt$region), "region_name"] = "Europe"
 FMcorrupt[FMcorrupt$region == 4 & ! is.na(FMcorrupt$region), "region_name"] = "Asia" # "South Asia"
@@ -183,48 +186,10 @@ may be appropriate for each variable.
 -->
 # Univariate Analysis of Key Variables
 
-Key Variables:
+We start our exploratory analysis with a high level look at all our variables. 
 
-* violations
-* corruption
-* car_total
-* trade
-* Region (kinda)
+## High Level Univariate Analysis
 
-# STILL WORKING ON THIS KH
-
-
-```{r}
-table_means = apply(correlation_matrix_input, 2, mean, na.rm = TRUE)
-table_sums = apply(correlation_matrix_input, 2, sum, na.rm = TRUE)
-table_sd = apply(correlation_matrix_input, 2, sd, na.rm = TRUE)
-table_bind = cbind(table_means, table_sums, table_sd)
-names(table_bind) = c("variable", "mean", "sum", "stddev")
-table_output = table_bind[c("violations.pre", "violations.pos", "violations_weighted.cars_total.pre", "violations_weighted.cars_total.pos", "trade"), ]
-
-
-kable(table_output, "latex", longtable = TRUE, booktabs = TRUE, caption = "Key Variable Summary Data Description") %>%
-  kable_styling(full_width = TRUE, latex_options = c("HOLD_position", "striped", "repeat_header"), row_label_position = 1)   
-
-```
-
-<!--
-Variable         | Mean | Std Dev | Observations 
------------------|------|---------|---------------
-violations before enforcement change |`r mean(cor_oneline$violations.pre)`|`r sd(cor_oneline$violations.pre)`|`r sum(!is.na(cor_oneline$violations.pre))` 
-violations after enforcement change |`r mean(cor_oneline$violations.pos)`|`r sd(cor_oneline$violations.pos)`|`r sum(!is.na(cor_oneline$violations.pos))` 
-violations per car before enforcement change |`r mean(correlation_matrix_input$violations_weighted.cars_total.pre, na.rm = TRUE)`|`r sd(correlation_matrix_input$violations_weighted.cars_total.pre, na.rm = TRUE)`|`r sum(!is.na(correlation_matrix_input$violations_weighted.cars_total.pre))` 
-violations per car after enforcement change |`r mean(correlation_matrix_input$violations_weighted.cars_total.pos, na.rm = TRUE)`|`r sd(correlation_matrix_input$violations_weighted.cars_total.pos, na.rm = TRUE)`|`r sum(!is.na(correlation_matrix_input$violations_weighted.cars_total.pos))` 
-Cars per mission |`r mean(cor_oneline$cars_total, na.rm = TRUE)`|`r sd(cor_oneline$cars_total, na.rm = TRUE)`|`r sum(!is.na(cor_oneline$cars_total))` 
-corruption       | ###  | ###     | # of non-NA's 
-trade |`r round(table_means["cars_total"], 2)`|###|###` 
--->
-...
-
-* show plots and summary data for key variables
-    + Summary table
-    + Frequency Distribution
-    
 ```{r results="asis"}
 # Use CSV version of Google Sheet 'Variable Description for Introduction': https://docs.google.com/spreadsheets/d/1cas_xxfaAY5CNGDAvBqa4ky5b8m61i3qTSgN4LrHT_g/edit#gid=621892365
 variable_description = read.csv("Lab 1 - Variable Descriptions for Introduction.csv", header = TRUE, sep = ",", quote = "\"", allowEscapes = TRUE)
@@ -234,6 +199,124 @@ kable(variable_description, "latex", longtable = TRUE, booktabs = TRUE, caption 
   kable_styling(full_width = TRUE, latex_options = c("HOLD_position", "striped", "repeat_header"), row_label_position = 1)   
 
 ```
+
+The objective of our analysis is to find if there is any relationship between corruption and parking tickets.  Of the variables above, both corruption and violations are clearly required in our Analysis of Key Relationships.  The number of violations alone is likely to mislead us as countries will have different number of staff and cars, during our Key Relationship Analysis, we'll explain why we're using cars and violations together.  Total aid provided by the US and the country's GDP per capita are also of interest and we'll explore those more in the Analysis of Secondary Effects. 
+
+## Further Analysis of Key Variables
+```{r}
+tmp_table_means = apply(correlation_matrix_input, 2, mean, na.rm = TRUE)
+tmp_table_sums = apply(correlation_matrix_input, 2, sum, na.rm = TRUE)
+tmp_table_sd = apply(correlation_matrix_input, 2, sd, na.rm = TRUE)
+tmp_table_bind = cbind(tmp_table_means, tmp_table_sums, tmp_table_sd)
+names(tmp_table_bind) = c("variable", "mean", "sum", "stddev")
+tmp_table_output = tmp_table_bind[c("violations.pre", "violations.pos", "violations_weighted.cars_total.pre", "violations_weighted.cars_total.pos", "cars_total", "trade", "totaid", "gdppcus1998"), ]
+
+
+kable(tmp_table_output, "latex", longtable = TRUE, booktabs = TRUE, caption = "Key Variable Summary Data Description") %>%
+  kable_styling(full_width = TRUE, latex_options = c("HOLD_position", "striped", "repeat_header"), row_label_position = 1)   
+
+# Clean up
+remove(tmp_table_means, tmp_table_sums, tmp_table_sd, tmp_table_bind, tmp_table_output)
+
+```
+TODO: Round the values above
+
+### Corruption
+```{r}
+par(mfrow = c(1, 2))
+hist(correlation_matrix_input$corruption, col="blue")
+boxplot(correlation_matrix_input$corruption, col = "blue")
+```
+
+TODO:
+
+* Anomalies?
+* coding issues? 
+* erroneous values? how were they fixed/dealt with?
+* Transformation? Why?
+
+
+### Cars (cars/staff)
+```{r}
+par(mfrow = c(1, 3))
+hist(correlation_matrix_input$cars_total, col="blue")
+boxplot(correlation_matrix_input$cars_total, col = "blue")
+boxplot(correlation_matrix_input$cars_total/correlation_matrix_input$staff, col = "blue")
+
+```
+TODO:
+
+* Anomalies?
+* coding issues? 
+* erroneous values? how were they fixed/dealt with?
+* Transformation? Why?
+
+### Trade
+```{r}
+par(mfrow = c(1, 2))
+hist(correlation_matrix_input$trade/10**9, col="blue") # BILLIONS
+boxplot(correlation_matrix_input$trade/10**9, col = "blue")
+```
+TODO:
+
+* Anomalies?
+* coding issues? 
+* erroneous values? how were they fixed/dealt with?
+* Transformation? Why?
+
+### Violations/Total Cars (w/ and w/o log())
+```{r}
+par(mfrow = c(1, 2))
+hist(correlation_matrix_input$violations_weighted.cars_total.pre, col="blue") 
+hist(correlation_matrix_input$violations_weighted.cars_total.pos, col="blue") 
+
+par(mfrow = c(1, 2))
+hist(correlation_matrix_input$violations_weighted.cars_total.pre.log, col="blue") 
+hist(correlation_matrix_input$violations_weighted.cars_total.pos.log, col="blue") 
+
+```
+TODO:
+
+* Anomalies?
+* coding issues? 
+* erroneous values? how were they fixed/dealt with?
+* Transformation? Why?
+
+### Total US Aid (Military and Economic)
+```{r}
+par(mfrow = c(1, 2))
+hist(correlation_matrix_input$totaid, col="blue")
+boxplot(correlation_matrix_input$totaid, col = "blue")
+
+par(mfrow = c(1, 2))
+hist(correlation_matrix_input$totaid.log, col="blue")
+boxplot(correlation_matrix_input$totaid.log, col = "blue")
+```
+TODO:
+
+* Anomalies?
+* coding issues? 
+* erroneous values? how were they fixed/dealt with?
+* Transformation? Why?
+
+
+TODO:
+
+Countries analysis
+
+
+```{r}
+# Reset default back to 1x1
+par(mfrow = c(1, 1))
+```
+
+
+...
+
+* show plots and summary data for key variables
+    + Summary table
+    + Frequency Distribution
+    
 
 <!--
 
@@ -390,6 +473,7 @@ Analysis of Secondary Effects (10 pts)
 What secondary variables might have confounding effects on the relationships you have identified? Explain
 how these variables affect your understanding of the data.
 -->
+
 # Analysis of Secondary Effects
 <!-- END ANALYSIS OF SECONDARY EFFECTS --> 
 TODO:
@@ -402,17 +486,24 @@ TODO:
 
 During our exploritory data analysis, we revealed three relationships to corruptions that may confound our key relationship analysis.  
 
-## A correlation between a corruption index and that country's Gross Domestic Product Per Capita
+## Relationship Between Corruption Index and That Country's Gross Domestic Product Per Capita
 
 ```{r}
 lm_cor_gdppc <- lm(gdppcus1998~corruption, data=correlation_matrix_input)
 ggplotRegression(lm_cor_gdppc,'Relationship between corruption and GDP Per Capita','Corruption Index','GDP Per Capita (in 1998 $US)')
 ```
+
+TODO: Explain how this ties in to key relationship
+
+## Relationship Between Corruption Index and The Amount of Aid Recieved by the US
 ```{r}
 lm_cor_totaid <- lm(totaid.log~corruption, data=correlation_matrix_input)
-ggplotRegression(lm_cor_totaid,'Relationship between corruption and Total Aid Received by US','Corruption Index','Total Aid Received')
+ggplotRegression(lm_cor_totaid,'Relationship between corruption and Total Aid Received by US (log)','Corruption Index','Total Aid Received')
 ```
 
+TODO: Explain how this ties in to key relationship
+
+## Why We Ignored the Relationship Between Mean Violations and Percentage of Country Who Identify as Muslim
 Our data set included the percentage of a country's population that identified as Muslim, and that happens to correlate with the number of violations per car.  However, the percentage of Mulsims also correlates with GDP per capita, and GDP per capita has a much stronger correlation to the number of violations per car.  We don't feel any relationships to a single religion is valuable in absense of other major religions, and even then correlations to corruption are not likely to be causal.    
 
 
@@ -422,7 +513,7 @@ Conclusion (20 pts)
 Summarize your exploratory analysis. What can you conclude based on your analysis?
 -->
 # Conclusion
-Some poople used to be jerks.  But now they're not. Enforcing fines works on Jerks.  Canadian's are not jerks (bias: author: Hanna, is a Canadian)
+
 <!-- END CONCLUSION -->
 
 # Appendix
