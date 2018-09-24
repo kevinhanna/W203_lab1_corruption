@@ -209,10 +209,16 @@ The objective of our analysis is to find if there is any relationship between co
 tmp_table_means = apply(correlation_matrix_input, 2, mean, na.rm = TRUE)
 tmp_table_sums = apply(correlation_matrix_input, 2, sum, na.rm = TRUE)
 tmp_table_sd = apply(correlation_matrix_input, 2, sd, na.rm = TRUE)
-tmp_table_bind = cbind(tmp_table_means, tmp_table_sums, tmp_table_sd)
-names(tmp_table_bind) = c("variable", "mean", "sum", "stddev")
+tmp_table_bind = data.frame(tmp_table_means, tmp_table_sums, tmp_table_sd)
+#tmp_table_bind = cbind(tmp_table_means, tmp_table_sums, tmp_table_sd)
+names(tmp_table_bind) = c("mean", "sum", "stddev")
 tmp_table_output = tmp_table_bind[c("violations.pre", "violations.pos", "violations_weighted.cars_total.pre", "violations_weighted.cars_total.pos", "cars_total", "trade", "totaid", "gdppcus1998"), ]
 
+#tmp_table_output$mean = round_df(tmp_table_output$mean, 2)
+#tmp_table_output$sum = round_df(tmp_table_output$sum, 2)
+#tmp_table_output$stddev = round_df(tmp_table_output$stddev ,2)
+
+tmp_table_output = format(tmp_table_output, digits=2)
 
 kable(tmp_table_output, "latex", longtable = TRUE, booktabs = TRUE, caption = "Key Variable Summary Data Description") %>%
   kable_styling(full_width = TRUE, latex_options = c("HOLD_position", "striped", "repeat_header"), row_label_position = 1)   
@@ -221,7 +227,7 @@ kable(tmp_table_output, "latex", longtable = TRUE, booktabs = TRUE, caption = "K
 remove(tmp_table_means, tmp_table_sums, tmp_table_sd, tmp_table_bind, tmp_table_output)
 
 ```
-TODO: Round the values and add labels above
+#TODO I don't know why the numbers above are in scientific notation??  Will fix.
 
 ### Corruption
 
@@ -252,18 +258,7 @@ hist(correlation_matrix_input$violations.pre, col="blue", xlab = "Violations Bef
 hist(correlation_matrix_input$violations.pos, col="blue", xlab = "Violations AFter Enforcement Change", main = "")
 ```
 
-```{r}
-par(mfrow = c(1, 2))
-hist(log(correlation_matrix_input$violations.pre + 1), col="blue", xlab = "Log Violations Before Enforcement Change", main = "Log Violations Freq. Dist.")
-hist(log(correlation_matrix_input$violations.pos + 1), col="blue", xlab = "Log Violations AFter Enforcement Change", main = "")
-
-```
-TODO:
-
-* Anomalies?
-* coding issues? 
-* erroneous values? how were they fixed/dealt with?
-* Transformation? Why?
+The scale of the bins alone for the violations variable shows a significant change in behavior after the enforcement change. This is a sum of all violations for each mission and the number of cars that belong to each mission is different.  To better make sense of the effects corruption has on parking violations we need to create a varable that removes the effect cars has on violations.  
 
 ### Violations/Total Cars Before and After Parking Violation Enforcement Changes
 ```{r}
@@ -283,26 +278,6 @@ hist(correlation_matrix_input$violations_weighted.cars_total.pos.log, col="blue"
 
 Now the frequency distribution is somewhat normalized.  There is still a large spike in the first bin of both frequency distributions, this is due to a lot of missions having few or no delinquent parking fines. The natural log transformation reduces the skewness especially before the enforcement changes leaving the distribution for after the enforcement changes still skewed negative which is desirable since it is the change in this skewness we are analyzing.
 
-<!--
-TODO: This reveals nothing, not enough countries receive aid.
-### Total US Aid (Military and Economic)
-```{r}
-par(mfrow = c(1, 2))
-hist(correlation_matrix_input$totaid, col="blue")
-boxplot(correlation_matrix_input$totaid, col = "blue")
-
-par(mfrow = c(1, 2))
-hist(correlation_matrix_input$totaid.log, col="blue")
-boxplot(correlation_matrix_input$totaid.log, col = "blue")
-```
-TODO:
-
-* Anomalies?
-* coding issues? 
-* erroneous values? how were they fixed/dealt with?
-* Transformation? Why?
--->
-
 
 ```{r}
 # Reset default back to 1x1
@@ -314,7 +289,7 @@ par(mfrow = c(1, 1))
 remove(variable_description)
 ```
 
-TODO: Explain why showing data
+Below is a sample of the key variables being analyzed for 20 countries sorted by the number of violations per car before the 2002 regulation change.  
 ```{r results="asis"}
 
 summary_table_output = cor_oneline[, c("country", "cars_total", "violations.pre", "violations.pos", "corruption")]

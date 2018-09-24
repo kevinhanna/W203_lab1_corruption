@@ -107,6 +107,9 @@ correlation_matrix_input$violations_weighted.cars_total.pos = correlation_matrix
 correlation_matrix_input$violations_weighted.staff.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$staff
 correlation_matrix_input$violations_weighted.staff.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$staff
 
+# add violations treated with staff
+correlation_matrix_input$wage_gdp = correlation_matrix_input$gdppcus1998 * correlation_matrix_input$gov_wage_gdp
+
 
 ignore = c("fines.pre", "violations.pos", "fines.pos",
            "spouse", "majoritymuslim", "cars_total", "cars_mission") # this are only part of the treatment (keeping violations for below)
