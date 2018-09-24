@@ -219,7 +219,7 @@ kable(tmp_table_output, "latex", longtable = TRUE, booktabs = TRUE, caption = "K
 remove(tmp_table_means, tmp_table_sums, tmp_table_sd, tmp_table_bind, tmp_table_output)
 
 ```
-TODO: Round the values above
+TODO: Round the values and add labels above
 
 ### Corruption
 
@@ -243,28 +243,17 @@ boxplot(correlation_matrix_input$cars_total/(correlation_matrix_input$staff + co
 
 Looking at the histogram on the left we see the vast majority of missions have 0 to 10 cars, which is unsuprising as are the ouliers seeing as some missions have a lot of staff.  We test this by dividing the total number of cars by the the number of staff and spouses.  This is displayed in the boxplot on the right, there are still some outliers however, the maximum is 2.6, and that could be explained by the absence of children in our dataset.  The frequency is skewed negative, but this variable will be used to treat violations and we'll apply the treatment to that combination. 
 
-### Trade
+### Violations
 ```{r}
 par(mfrow = c(1, 2))
-hist(correlation_matrix_input$trade/10**9, col="blue") # BILLIONS
-boxplot(correlation_matrix_input$trade/10**9, col = "blue")
+hist(correlation_matrix_input$violations.pre, col="blue", xlab = "Violations Before Enforcement Change", main = "Violations Frequency Dist.")
+hist(correlation_matrix_input$violations.pos, col="blue", xlab = "Violations AFter Enforcement Change", main = "")
 ```
-TODO:
 
-* Anomalies?
-* coding issues? 
-* erroneous values? how were they fixed/dealt with?
-* Transformation? Why?
-
-### Violations/Total Cars (w/ and w/o log())
 ```{r}
 par(mfrow = c(1, 2))
-hist(correlation_matrix_input$violations_weighted.cars_total.pre, col="blue") 
-hist(correlation_matrix_input$violations_weighted.cars_total.pos, col="blue") 
-
-par(mfrow = c(1, 2))
-hist(correlation_matrix_input$violations_weighted.cars_total.pre.log, col="blue") 
-hist(correlation_matrix_input$violations_weighted.cars_total.pos.log, col="blue") 
+hist(log(correlation_matrix_input$violations.pre + 1), col="blue", xlab = "Log Violations Before Enforcement Change", main = "Log Violations Freq. Dist.")
+hist(log(correlation_matrix_input$violations.pos + 1), col="blue", xlab = "Log Violations AFter Enforcement Change", main = "")
 
 ```
 TODO:
@@ -274,6 +263,26 @@ TODO:
 * erroneous values? how were they fixed/dealt with?
 * Transformation? Why?
 
+### Violations/Total Cars Before and After Parking Violation Enforcement Changes
+```{r}
+par(mfrow = c(1, 2))
+hist(correlation_matrix_input$violations_weighted.cars_total.pre, col="blue", xlab="Violations/Total Cars Before Enforcement", main = "Violations/Total Cars Frq. Dist.") 
+hist(correlation_matrix_input$violations_weighted.cars_total.pos, col="blue", xlab="Violations/Total Cars After Enforcement", main = "") 
+```
+
+The frequency distribution of the transformation $violations/total$ above is skewed negatively giving cause to believe most diplomats are paying any parking fines in a timely maner.  This skewness however, will prevent our Analysis of Key Relationships yielding compelling results without some further transformation.
+
+```{r}
+par(mfrow = c(1, 2))
+hist(correlation_matrix_input$violations_weighted.cars_total.pre.log, col="blue", xlab="Log Violations/Total Cars Before Enforcement", main = "Violations/Total Cars Frq. Dist.")
+hist(correlation_matrix_input$violations_weighted.cars_total.pos.log, col="blue", xlab="Log Violations/Total Cars After Enforcement", main = "") 
+
+```
+
+Now the frequency distribution is somewhat normalized.  There is still a large spike in the first bin of both frequency distributions, this is due to a lot of missions having few or no delinquent parking fines. The natural log transformation reduces the skewness especially before the enforcement changes leaving the distribution for after the enforcement changes still skewed negative which is desirable since it is the change in this skewness we are analyzing.
+
+<!--
+TODO: This reveals nothing, not enough countries receive aid.
 ### Total US Aid (Military and Economic)
 ```{r}
 par(mfrow = c(1, 2))
@@ -290,11 +299,7 @@ TODO:
 * coding issues? 
 * erroneous values? how were they fixed/dealt with?
 * Transformation? Why?
-
-
-TODO:
-
-Countries analysis
+-->
 
 
 ```{r}
@@ -303,66 +308,12 @@ par(mfrow = c(1, 1))
 ```
 
 
-...
-
-* show plots and summary data for key variables
-    + Summary table
-    + Frequency Distribution
-    
-
-<!--
-
-#Alex notes to be incorporated above
-
-"""Data quality issues:  
-~~1) We have several extra observations that have NaN values for key variables. These data likely reflect a merging 
-process wherein the desired dataset regarding parking violations and fines was merged with economic data. 
-+wbcode is impacted by this. There are 213 unique values for wbcode, whereas there are only 151 countries with pre and post-legislation 
-observations
-++++Suggestion: We drop the N/A variables and note the number of countries for which we have no data.~~
-
-2) The violations and fines data are odd. The instructions do not provide adequate background regarding these variables.
-This is a particular problem because these variable are at the core of the proposed analysis.
-Oddities:
-+violations has 7 decimal places. This is odd because we would expect a positive integer (in the case of a single year)
-or at least a figure that is recognizable as an average of some sort (in the case of multiple years)  
-
-3) The mission, staff, and spouse variables also contain oddities. For example, the entries for HKG and PRI are 0. These are the only zeros in 
-those variables. Looking at the values for other variables for those two observations, some other oddities emerge. For example:
-+HKG's majoritymuslim (which should be a dummy variable of either 1 or 0) is -1
-++++Suggestion: Given that our research question regards the impact of the corruption on willingness to incur parking
-violations and fines in NYC, we probably do not care about observations without a mission in NYC.
-As such, taking all of these oddities and the low desirability of the data, I recommend excluding. where 
-mission equals 0 or NaN  
-
-4) The variable gov_wage_gdp is not specified in the instructions, and no source for the data is provided. We don't know if this comes from 
-an official sector body or from some potentially less rigorous institution. Furthermore, the data appears somewhat disconnected from our 
-core violations and fines variables, as there are numerous NaNs for gov_wage_gdp where valid values exist for violations and fines. I do think
-the concept that this variable hints at - the impact of government workers' wages on their willingness to occur fines - would be interesting to
-examine in relation to the degree of decline from the pre to the post subsets. The thinking being that those government workers with lower average
-salaries would be less willing to incur fines out of their own pocket. This is potentially problematic though as it is not clear that the
-workers themselves would definitely be the ones paying for the fines. 
-++++Suggestion: Given that we don't know the provenance of this dataset nor how it was calculated, I would not treat results using this
-dataset with a high degree of confidence. Rather, I would be inclined to largely exclude this variable from the analysis
-At most, it should be used with caution in it's own separate section.  
-
-5) The variable pctmuslim is among the more complete variables outside the core violations and fines dataset. We are not told the origin of this variable
-either, so we have no idea of its veracity other than a common sense check. The thought behind including this variable may be that religion
-and perhaps, Islam in particular, would have an impact on ethical or ethical (corrupt) behavior. It is not clear to me why Islam would be 
-included and all other religions excluded. A more appropriate variable would be the percent of population which practices religion. It is 
-also not clear to me that the ethics-religion association is necessarily as strong as some might think it is, though a more valid non-biased
-variable could be used to test that relationship.  
-"""
--->
 ```{r}
 remove(variable_description)
 ```
 
-
+TODO: Explain why showing data
 ```{r results="asis"}
-
-# This is assuming staff is better than cars, staff+spouse, total_cars.  Though I don't know if that's safe yet.
-
 
 summary_table_output = cor_oneline[, c("country", "cars_total", "violations.pre", "violations.pos", "corruption")]
 summary_table_output$mean_violations_per_car.pre = summary_table_output$violations.pre/summary_table_output$cars_total
@@ -468,14 +419,6 @@ how these variables affect your understanding of the data.
 
 # Analysis of Secondary Effects
 <!-- END ANALYSIS OF SECONDARY EFFECTS --> 
-TODO:
-
-* the relationships between gov wage, gdp per capita and corruption
-    + Countries with higher violations + higher corruption index might be low gov_wage_gdp or low GDP pc
-    + GDP PC relates with trade, making the correlation between gdp and corruption and vilations a little merky still.
-* ~~analyze gov_wage_gdp (particular after, when fines are being paid)~~ Correlation changes in step with the gerneral change after the enforcement
-* ~~analyze trade relationship~~ (I will include in gdp and corruption)
-
 During our exploritory data analysis, we revealed three relationships to corruptions that may confound our key relationship analysis.  
 
 ## Relationship Between Corruption Index and That Country's Gross Domestic Product Per Capita
@@ -495,9 +438,11 @@ ggplotRegression(lm_cor_totaid,'Relationship between corruption and Total Aid Re
 
 TODO: Explain how this ties in to key relationship
 
-## Why We Ignored the Relationship Between Mean Violations and Percentage of Country Who Identify as Muslim
+## Percentage of Country Who Identify as Muslim
 Our data set included the percentage of a country's population that identified as Muslim, and that happens to correlate with the number of violations per car.  However, the percentage of Mulsims also correlates with GDP per capita, and GDP per capita has a much stronger correlation to the number of violations per car.  We don't feel any relationships to a single religion is valuable in absense of other major religions, and even then correlations to corruption are not likely to be causal.    
 
+## Trade Between Countries and the US.
+Trade is positively correlated with the number of mission staff and spouses.  It seems the more trade there is between a country and the US, the more staff (and cars) there are at the mission in NYC.  The number of cars at the mission it turns out acts as a proxy variable for trade, and it is more relevant to our analysis as it can be used to find the mean violations.  Therefore, we have not included analysis on trade. 
 
 <!-- BEGIN CONCLUSION -->
 <!--
