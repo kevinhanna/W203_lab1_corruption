@@ -223,7 +223,6 @@ TODO: Round the values above
 
 ### Corruption
 
-
 ```{r}
 par(mfrow = c(1, 2))
 hist(correlation_matrix_input$corruption, col="blue", main = "Corruption Frequency Dist.", xlab = "Corruption Index")
