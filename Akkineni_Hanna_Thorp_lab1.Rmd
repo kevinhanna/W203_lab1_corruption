@@ -420,9 +420,12 @@ ggplotRegression(lm_cor_totaid,'Relationship between corruption and Total Aid Re
 
 Total military and economic aid provided to the country by the U.S. is also correlated to corruption and violations. This is intuitive as foreign aid tends to go to less developed countries and less developed countries also tend to be more corrupt. As such, we are not convinced that foreign aid really provides any new information in this context.
 
+```{r}
+lm9 <- lm(violations_weighted.cars_total.pre.log~totaid.log,data=subs)
+ggplotRegression(lm9,'Relationship between Pre-regulation Violations per Car and Total Aid','Log of Total Aid','Pre-Regulation Log of Violations per Car')
+```
 
-
-Importantly, in our analysis we noticed that the correlation between total aid and violations changed from 0.44 to -0.06 moving from pre- to post-regulation.  We investigated further and found there was another change in parking ticket payment enforcement made around the same time; unpaid parking fines could be deducted from aid provided to the country which may explain some of the change in the number violations at this time. Having made assumptions about the total aid variable we are only able to suggest their might be a confounding effect caused by aid.
+We also examined the relationship between violations per car and total aid, taking the log of both variables to compress the distribution. This plot shows that relationship to be largely random - not one worth further exploration. The post-regulation violations per car chart showed a similar lack of relationship.
 
 ## Percentage of Country Who Identify as Muslim
 Our dataset included the percentage of a country's population that identified as Muslim, and that happens to correlate with the number of violations per car.  However, the percentage of Muslims also correlates with GDP per capita, and GDP per capita has a much stronger correlation to the number of violations per car.  We feel that this variable really contains information similar to other economic data. Additionally, we don't feel any relationships to a single religion is valuable in absense of other major religions having different correlations with independent variables.    
