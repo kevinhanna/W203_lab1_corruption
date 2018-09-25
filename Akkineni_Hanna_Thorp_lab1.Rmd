@@ -87,7 +87,7 @@ colnames(cor_oneline) =  c("wbcode", "violations.pre",  "violations.pos", "fines
 cor_nas = FMcorrupt
 remove(FMcorrupt)
 
-# Variable treatments for analysis
+# Variable alterations and transformations for analysis
 correlation_matrix_input = cor_oneline[, c("corruption", "violations.pre", "fines.pre", "violations.pos", "fines.pos",
                                                         "staff", "spouse", "majoritymuslim", "pctmuslim", "trade", "cars_total", "cars_mission", "totaid", "gdppcus1998"
                                                         )]
@@ -167,13 +167,13 @@ round_df <- function(x, digits) {
 # Introduction
 
 ## Research Question
-Prior to 2002 diplomats at UN missions were exampt from parking violations and fines in New York City, by virtue of their diplomatic immunity. There was wide variation in diplomats' willingness to adhere to local parking laws. This analysis attempts to understand whether the variation in adherance to local parking law was related to cultural norms in the diplomats' home countries. For the period prior to 2002, we examine the relationship between perceptions of corruption in that country and  that countries' diplomats' willingness to incur parking violations. In 2002 NYC parking enforcement acquired the right to confiscate license plates from vehicles belonging to foreign diplomats if they had accumulated unpaid parking violations, thus making payment an function of both cultral norms and legal enforcment. This had a notable compressing effect on parking law adherence. 
+Prior to 2002 diplomats at UN missions were exampt from parking violations and fines in New York City, by virtue of their diplomatic immunity. There was wide variation in diplomats' willingness to adhere to local parking laws. This analysis attempts to understand whether the variation in adherance to local parking law was related to cultural norms in the diplomats' home countries. For the period prior to 2002, we examine the relationship between perceptions of corruption in that country and  that countries' diplomats' willingness to incur parking violations. In 2002 NYC parking enforcement acquired the right to confiscate license plates from vehicles belonging to foreign diplomats if they had accumulated unpaid parking violations, thereby making payment a function of both cultral norms and legal enforcment. This had a notable compressing effect on parking law adherence. 
 
 **Question:** Does an index of perceived corruption in the diplomats' home country have explanatory power for a given diplomatic mission's compliance with local parking regulations?
 
 ## Description of Dataset
 
-Our data set has a total of 364 observations. Of the 364, 66 observations contain only economic data leaving NA for our dependent variable, violations. Considering the countries that are among these 66 and the variables for which they have valid data, we suspect these rows result from a merge of economic data with the violations data. As such, we believe these 66 countries represent a data artefact from that data merge. As these observations do not contain valid values for key variables, we remove them from our dataset. Of note, those 66 observations appear to contain many which do not even have a mission or staff in New York City, and as such are not relevant for this study on diplomatic parking violations in New York City. Given these considerations, we feel comfortable that we are not biasing the results of the study by removing these observations. With those 66 rows removed, we're left with 298 observations (two observations for each of 149 countries where corruption data exists.) Each country has one observation from prior to the 2002 regulation change and one observation from after. Only the 'violations' and 'fines' variables differ between the two observations for a given country, while other variables remain constant. 
+Our dataset has a total of 364 observations. Of the 364, 66 observations contain only economic data leaving NA for our dependent variable, violations. Considering the countries that are among these 66 and the variables for which they have valid data, we suspect these rows result from a merge of economic data with the violations data. As such, we believe these 66 countries represent a data artefact from that data merge. As these observations do not contain valid values for key variables, we remove them from our dataset. Of note, those 66 observations appear to contain many which do not even have a mission or staff in New York City, and as such are not relevant for this study on diplomatic parking violations in New York City. Given these considerations, we feel comfortable that we are not biasing the results of the study by removing these observations. With those 66 rows removed, we're left with 298 observations (two observations for each of 149 countries where corruption data exists.) Each country has one observation from prior to the 2002 regulation change and one observation from after. Only the 'violations' and 'fines' variables differ between the two observations for a given country, while other variables remain constant. 
 
 
 
@@ -197,12 +197,12 @@ We start our exploratory analysis with a high level look at all our variables to
 variable_description = read.csv("Lab 1 - Variable Descriptions for Introduction.csv", header = TRUE, sep = ",", quote = "\"", allowEscapes = TRUE)
 #summary(variable_description)
 
-kable(variable_description, "latex", longtable = TRUE, booktabs = TRUE, caption = "Data Set Variables") %>%
+kable(variable_description, "latex", longtable = TRUE, booktabs = TRUE, caption = "Dataset Variables") %>%
   kable_styling(full_width = TRUE, latex_options = c("HOLD_position", "striped", "repeat_header"), row_label_position = 1)   
 
 ```
 
-The objective of our analysis is to find if there is any relationship between corruption and parking tickets.  Of the variables above, both corruption and violations are clearly required in our Analysis of Key Relationships.  The number of violations alone is likely to mislead us as countries will have different number of staff and cars, during our Key Relationship Analysis, we'll explain why we're using cars and violations together.  Total aid provided by the US and the country's GDP per capita are also of interest and we'll explore those more in the Analysis of Secondary Effects. 
+The objective of our analysis is to find if there is any relationship between corruption and parking tickets.  Of the variables above, both corruption and violations are plainly essential to our study in our Analysis of Key Relationships.  The number of violations alone is likely to mislead us as countries will have different number of staff and cars, during our Key Relationship Analysis, we'll explain why we're using cars and violations together.  Total aid provided by the US and the country's GDP per capita are also of interest and we'll explore those more in the Analysis of Secondary Effects. 
 
 ## Further Analysis of Key Variables
 ```{r}
@@ -237,7 +237,7 @@ hist(correlation_matrix_input$corruption, col="blue", main = "Corruption Frequen
 boxplot(correlation_matrix_input$corruption, col = "blue", ylab = "Corruption Index")
 ```
 
-We don't fully understand the corruption variable other than to say it appears to be an index. The frequency distribution skews negative, however the median (`r round(median(correlation_matrix_input$corruption),2)`) is pretty close to 0 which suggests the values might be deliberately scaled to balance around 0, so we will not apply any treatments to corruption.  The outliers in the boxplot are expected with this skew.
+We don't fully understand the corruption variable other than to say it appears to be an index. The frequency distribution skews negative, however the median (`r round(median(correlation_matrix_input$corruption),2)`) is pretty close to 0 which suggests the values might be deliberately scaled to balance around 0, so we will not apply any transformations to corruption.  The outliers in the boxplot are expected with this skew.
 
 
 ### Total Cars for Each Mission
@@ -249,7 +249,7 @@ boxplot(correlation_matrix_input$cars_total/(correlation_matrix_input$staff + co
 
 ```
 
-Looking at the histogram on the left we see the vast majority of missions have 0 to 10 cars, which is unsuprising as are the ouliers seeing as some missions have a lot of staff.  We test this by dividing the total number of cars by the the number of staff and spouses.  This is displayed in the boxplot on the right, there are still some outliers however, the maximum is 2.6, and that could be explained by the absence of children in our dataset.  The frequency is skewed negative, but this variable will be used to treat violations and we'll apply the treatment to that combination. 
+Looking at the histogram on the left we see the vast majority of missions have 0 to 10 cars, which is unsuprising as are the ouliers seeing as some missions have a lot of staff.  We test this hypothesis by dividing the total number of cars by the the number of staff and spouses.  This is displayed in the boxplot on the right, there are still some outliers however, the maximum is 2.6, and that could be explained by the absence of children in our dataset and staff having more than one car.  The frequency is skewed negative, but this variable will be used to create an average with violations and we'll apply the transformation to that combination. 
 
 ### Violations
 ```{r}
@@ -267,7 +267,7 @@ hist(correlation_matrix_input$violations_weighted.cars_total.pre, col="blue", xl
 hist(correlation_matrix_input$violations_weighted.cars_total.pos, col="blue", xlab="Violations/Total Cars After Enforcement", main = "") 
 ```
 
-The frequency distribution of the transformation $violations/total$ above is skewed negatively giving cause to believe most diplomats are paying any parking fines in a timely maner.  This skewness however, will prevent our Analysis of Key Relationships yielding compelling results without some further transformation.
+The frequency distribution of the transformation $violations/total cars$ above is skewed negatively giving cause to believe most diplomats are paying any parking fines in a timely maner.  This skewness however, will prevent our Analysis of Key Relationships yielding compelling results without some further transformation.
 
 ```{r}
 par(mfrow = c(1, 2))
@@ -363,7 +363,7 @@ ggplotRegression(lm5,'Comparing a Mission\'s Violations per Car','Pre-Regulation
 ```
 From this chart, we can again take away a sense that those countries which had higher violations prior to the regulations were also likely to have relatively higher violations after the regulation, even after controlling for the conflating of size impacts by normalizing violations with the most appropriate proxy for the mission size-type variables. And, importantly, this formulation of size normalization appears to offer the best preservation of signal on country differences in violations even after controlling for size. This selection also makes intuitive sense as only cars can incur parking fines - people without cars do not. 
 
-Now we turn to understanding how other variables in our data set might help explain the differences in violations per car. We will begin with an examination of the relationship between the provided corruption index and violations per car, with other variables addressed in subsequent sections.
+Now we turn to understanding how other variables in our dataset might help explain the differences in violations per car. We will begin with an examination of the relationship between the provided corruption index and violations per car, with other variables addressed in subsequent sections.
 
 We begin by examining the relationship between pre-regulation # of violations per car and the provided corruption index. 
 
@@ -418,7 +418,7 @@ ggplotRegression(lm_cor_totaid,'Relationship between corruption and Total Aid Re
 Total aid, which we assume is sum of an index (not dollars) of military and economic aid provided to the country by the U.S. is also correlated to corruption. In our analysis we noticed that the correlation between total aid and the violations changed from 0.44 to -0.06.  We investigated further and found there was another change in parking ticket payment enforcement made around the same time; unpaid parking could be deducted from aid provided to the country which may explain some of the change in the number violations at this time. Having made assumptions about the total aid variable we are only able to suggest their might be a confounding effect caused by aid.
 
 ## Percentage of Country Who Identify as Muslim
-Our data set included the percentage of a country's population that identified as Muslim, and that happens to correlate with the number of violations per car.  However, the percentage of Mulsims also correlates with GDP per capita, and GDP per capita has a much stronger correlation to the number of violations per car.  We don't feel any relationships to a single religion is valuable in absense of other major religions having different correlations with independent variables.    
+Our dataset included the percentage of a country's population that identified as Muslim, and that happens to correlate with the number of violations per car.  However, the percentage of Mulsims also correlates with GDP per capita, and GDP per capita has a much stronger correlation to the number of violations per car.  We don't feel any relationships to a single religion is valuable in absense of other major religions having different correlations with independent variables.    
 
 ## Trade Between Countries and the US.
 Trade is positively correlated with the number of mission staff and spouses.  It seems the more trade there is between a country and the US, the more staff (and cars) there are at the mission in NYC.  The number of cars at the mission it turns out acts as a proxy variable for trade, and it is more relevant to our analysis as it can be used to find the mean violations.  Therefore, we have not included analysis on trade. 
