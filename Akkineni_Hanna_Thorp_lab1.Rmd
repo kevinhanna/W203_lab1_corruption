@@ -205,6 +205,8 @@ kable(variable_description, "latex", longtable = TRUE, booktabs = TRUE, caption 
 Both the corruption and violations variables are essential to our examination. There are several variables which reflect the size of the mission (staff, spouse, cars) These are explored in the analysis of key relationships. Total aid provided by the US and the country's GDP per capita are also of interest and we'll explore those more in the Analysis of Secondary Effects. 
 
 ## Further Analysis of Key Variables
+
+<!--
 ```{r}
 tmp_table_means = apply(correlation_matrix_input, 2, mean, na.rm = TRUE)
 tmp_table_sums = apply(correlation_matrix_input, 2, sum, na.rm = TRUE)
@@ -228,6 +230,21 @@ remove(tmp_table_means, tmp_table_sums, tmp_table_sd, tmp_table_bind, tmp_table_
 
 ```
 #TODO I don't know why the numbers above are in scientific notation??  Will fix.
+-->
+### Key Variable Summary Data
+
+&nbsp;                                                 | Mean    | Sum    | Standard Deviation
+-------------------------------------------------------|---------|--------|----------
+Country Violations Before Regulation Change | 198.07 | 29,512.54 | 405.28 
+Country Violations After Regulation Change | 3.69 | 549.46 | 6.01 
+Country Violations/Total Cars Before Regulation Change | 22.42 | 3,116.38 | 31.71 
+Country Violations/Total Cars After Regulation Change | 0.62 | 86.11 | 1.53 
+Total Cars for Mission | 10.47 | 1,455.00 | 13.98 
+Trade with US (1998 Billions $US) | 10.25 | 1,506.59 | 35.65 
+Total   Economic and Military Aid Provided by US (1998 $US) | 82.32 | 12,101.00 | 385.72 
+GDP Per Capita (1998 $US) | 5,044.09 | 751,569.00 | 7,971.67 
+
+
 
 ### Corruption
 
@@ -421,7 +438,7 @@ ggplotRegression(lm_cor_totaid,'Relationship between corruption and Total Aid Re
 Total military and economic aid provided to the country by the U.S. is also correlated to corruption and violations. This is intuitive as foreign aid tends to go to less developed countries and less developed countries also tend to be more corrupt. As such, we are not convinced that foreign aid really provides any new information in this context.
 
 ```{r}
-lm9 <- lm(violations_weighted.cars_total.pre.log~totaid.log,data=subs)
+lm9 <- lm(violations_weighted.cars_total.pre.log~totaid.log,data=correlation_matrix_input)
 ggplotRegression(lm9,'Relationship between Pre-regulation Violations per Car and Total Aid','Log of Total Aid','Pre-Regulation Log of Violations per Car')
 ```
 
