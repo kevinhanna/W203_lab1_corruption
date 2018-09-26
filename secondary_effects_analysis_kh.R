@@ -149,9 +149,17 @@ scatterplotMatrix( ~ corruption + gov_wage_gdp + gdppcus1998 + totaid, data = co
 lm5 <- lm(gdppcus1998~corruption, data=correlation_matrix_input)
 ggplotRegression(lm5,'Relationship between corruption and GDP Per Capita','Corruption Index','GDP Per Capita (in 1998 $US)')
 
+correlation_matrix_input$violations_weighted.cars_total.pre.log = log(correlation_matrix_input$violations_weighted.cars_total.pre + 1)
+correlation_matrix_input$violations_weighted.cars_total.pos.log = log(correlation_matrix_input$violations_weighted.cars_total.pos + 1)
+
 correlation_matrix_input$totaid.log = log(correlation_matrix_input$totaid + 1)
-lm5 <- lm(totaid.log~corruption, data=correlation_matrix_input)
+
+par(mfrow = c(1, 2))
+lm5 <- lm(totaid.log~violations_weighted.cars_total.pre.log, data=correlation_matrix_input)
 ggplotRegression(lm5,'Relationship between corruption and GDP Per Capita','Corruption Index','GDP Per Capita (in 1998 $US)')
+
+lm6 <- lm(totaid.log~violations_weighted.cars_total.pos.log, data=correlation_matrix_input)
+ggplotRegression(lm6,'Relationship between corruption and GDP Per Capita','Corruption Index','GDP Per Capita (in 1998 $US)')
 
 """
 Key Variables:
