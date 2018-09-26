@@ -409,7 +409,7 @@ Now we turn to understanding how other variables in our dataset might help expla
 We begin by examining the relationship between pre-regulation # of violations per car and the provided corruption index. 
 
 ```{r}
-lm6 <- lm(corruption~violations_weighted.cars_total.pre.log, data=correlation_matrix_input)
+lm6 <- lm(violations_weighted.cars_total.pre.log~corruption, data=correlation_matrix_input)
 ggplotRegression(lm6,'Relationship between Pre-regulation Violations per Car and Corruption Index','Corruption Index','Pre-Regulation Log of Violations per Car')
 ```
 From this chart, we can see a strong positive relationship between these two variables appears clear, although there is much more going on than is characterized here as the corelationship is notable but far from linear. This chart can be interpreted as - for a 1 unit increase in the country's ranking on this corruption index, we expect to see a 63 percent increase in that country's number of parking violations per car.  
