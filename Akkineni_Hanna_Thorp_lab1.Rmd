@@ -47,10 +47,10 @@ FMcorrupt$region_name = NA
 FMcorrupt[FMcorrupt$region == 1 & ! is.na(FMcorrupt$region), "region_name"] = "North America"
 FMcorrupt[FMcorrupt$region == 2 & ! is.na(FMcorrupt$region), "region_name"] = "South America"
 FMcorrupt[FMcorrupt$region == 3 & ! is.na(FMcorrupt$region), "region_name"] = "Europe"
-FMcorrupt[FMcorrupt$region == 4 & ! is.na(FMcorrupt$region), "region_name"] = "Asia" # "South Asia"
+FMcorrupt[FMcorrupt$region == 4 & ! is.na(FMcorrupt$region), "region_name"] = "Asia" 
 FMcorrupt[FMcorrupt$region == 5 & ! is.na(FMcorrupt$region), "region_name"] = "Oceania"
 FMcorrupt[FMcorrupt$region == 6 & ! is.na(FMcorrupt$region), "region_name"] = "Africa"
-FMcorrupt[FMcorrupt$region == 7 & ! is.na(FMcorrupt$region), "region_name"] = "Middle East" # "Western Asia"
+FMcorrupt[FMcorrupt$region == 7 & ! is.na(FMcorrupt$region), "region_name"] = "Middle East"
 
 FMcorrupt$region_name = factor(FMcorrupt$region_name)
 
@@ -67,8 +67,10 @@ cor_oneline = merge(cor_pre, cor_pos, by = "wbcode", suffixes = c(".pre", ".pos"
 
 # Grab only the variables that are needed.
 cor_oneline = cor_oneline[, c("wbcode", "violations.pre",  "violations.pos", "fines.pre", "fines.pos",
-                              "mission.pre", "staff.pre", "spouse.pre", "gov_wage_gdp.pre", "pctmuslim.pre",        "majoritymuslim.pre", "trade.pre",
-                              "cars_total.pre", "cars_mission.pre", "pop1998.pre", "gdppcus1998.pre", "ecaid.pre", "milaid.pre", "corruption.pre", "totaid.pre",
+                              "mission.pre", "staff.pre", "spouse.pre", "gov_wage_gdp.pre", "pctmuslim.pre",
+                              "majoritymuslim.pre", "trade.pre",
+                              "cars_total.pre", "cars_mission.pre", "pop1998.pre", "gdppcus1998.pre", "ecaid.pre", 
+                              "milaid.pre", "corruption.pre", "totaid.pre",
                               "r_africa.pre", "r_middleeast.pre", "r_europe.pre", "r_southamerica.pre", "r_asia.pre",
                               "country.pre", "distUNplz.pre",
                               "region.pre", "region_name.pre"
@@ -89,48 +91,69 @@ remove(FMcorrupt)
 
 # Variable alterations and transformations for analysis
 correlation_matrix_input = cor_oneline[, c("corruption", "violations.pre", "fines.pre", "violations.pos", "fines.pos",
-                                                        "staff", "spouse", "majoritymuslim", "pctmuslim", "trade", "cars_total", "cars_mission", "totaid", "gdppcus1998"
+                                           "staff", "spouse", "majoritymuslim", "pctmuslim", "trade",
+                                           "cars_total", "cars_mission", "totaid", "gdppcus1998"
                                                         )]
 #add log transformations
 #(with the addition of 1 to the log transform to circumvent issues with the values between 0 and 1)
 correlation_matrix_input$violations.pos.log = log(correlation_matrix_input$violations.pos+1) 
 correlation_matrix_input$violations.pre.log = log(correlation_matrix_input$violations.pre+1)
 # add violations treated with total cars
-correlation_matrix_input$violations_weighted.cars_total.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$cars_total
-correlation_matrix_input$violations_weighted.cars_total.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$cars_total
+correlation_matrix_input$violations_weighted.cars_total.pre =
+  correlation_matrix_input$violations.pre/correlation_matrix_input$cars_total
+correlation_matrix_input$violations_weighted.cars_total.pos =
+  correlation_matrix_input$violations.pos/correlation_matrix_input$cars_total
 
 #add log transformations
 #The addition of 1 to the normalized number of violations would not be acceptable for predictive or causal modeling, but it
 # will help us circumvent the 0 - 1 log transformation issues while maintaining the sequence of observations within each variable.
 
-correlation_matrix_input$violations_weighted.cars_total.pre.log = log(correlation_matrix_input$violations_weighted.cars_total.pre+1)
-correlation_matrix_input$violations_weighted.cars_total.pos.log = log(correlation_matrix_input$violations_weighted.cars_total.pos+1)
+correlation_matrix_input$violations_weighted.cars_total.pre.log = 
+  log(correlation_matrix_input$violations_weighted.cars_total.pre+1)
+
+correlation_matrix_input$violations_weighted.cars_total.pos.log = 
+  log(correlation_matrix_input$violations_weighted.cars_total.pos+1)
 
 # add violations treated with staff
-correlation_matrix_input$violations_weighted.staff.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$staff
-correlation_matrix_input$violations_weighted.staff.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$staff
+correlation_matrix_input$violations_weighted.staff.pre = 
+  correlation_matrix_input$violations.pre/correlation_matrix_input$staff
+
+correlation_matrix_input$violations_weighted.staff.pos = 
+  correlation_matrix_input$violations.pos/correlation_matrix_input$staff
 
 # add violations treated with total people (staff + spouse)
-correlation_matrix_input$total_people = correlation_matrix_input$staff + correlation_matrix_input$spouse
+correlation_matrix_input$total_people = 
+  correlation_matrix_input$staff + correlation_matrix_input$spouse
 
-correlation_matrix_input$violations_weighted.total_people.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$total_people
-correlation_matrix_input$violations_weighted.total_people.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$total_people
+correlation_matrix_input$violations_weighted.total_people.pre = 
+  correlation_matrix_input$violations.pre/correlation_matrix_input$total_people
+
+correlation_matrix_input$violations_weighted.total_people.pos = 
+  correlation_matrix_input$violations.pos/correlation_matrix_input$total_people
 
 # add violations treated with cars_mission
-correlation_matrix_input$violations_weighted.cars_mission.pre = correlation_matrix_input$violations.pre/correlation_matrix_input$cars_mission
-correlation_matrix_input$violations_weighted.cars_mission.pos = correlation_matrix_input$violations.pos/correlation_matrix_input$cars_mission
+correlation_matrix_input$violations_weighted.cars_mission.pre =
+  correlation_matrix_input$violations.pre/correlation_matrix_input$cars_mission
+correlation_matrix_input$violations_weighted.cars_mission.pos =
+  correlation_matrix_input$violations.pos/correlation_matrix_input$cars_mission
 
 
 #add log transformations
 #The addition of 1 to the normalized number of violations would not be acceptable for predictive or causal modeling, but it
 # will help us circumvent the 0 - 1 log transformation issues while maintaining the sequence of observations within each variable.
 
-correlation_matrix_input$violations_weighted.staff.pre.log = log(correlation_matrix_input$violations_weighted.staff.pre+1)
-correlation_matrix_input$violations_weighted.staff.pos.log = log(correlation_matrix_input$violations_weighted.staff.pos+1)
-correlation_matrix_input$violations_weighted.total_people.pre.log = log(correlation_matrix_input$violations_weighted.total_people.pre+1)
-correlation_matrix_input$violations_weighted.total_people.pos.log = log(correlation_matrix_input$violations_weighted.total_people.pos+1)
-correlation_matrix_input$violations_weighted.cars_mission.pre.log = log(correlation_matrix_input$violations_weighted.cars_mission.pre+1)
-correlation_matrix_input$violations_weighted.cars_mission.pos.log = log(correlation_matrix_input$violations_weighted.cars_mission.pos+1)
+correlation_matrix_input$violations_weighted.staff.pre.log = 
+  log(correlation_matrix_input$violations_weighted.staff.pre+1)
+correlation_matrix_input$violations_weighted.staff.pos.log = 
+  log(correlation_matrix_input$violations_weighted.staff.pos+1)
+correlation_matrix_input$violations_weighted.total_people.pre.log =
+  log(correlation_matrix_input$violations_weighted.total_people.pre+1)
+correlation_matrix_input$violations_weighted.total_people.pos.log =
+  log(correlation_matrix_input$violations_weighted.total_people.pos+1)
+correlation_matrix_input$violations_weighted.cars_mission.pre.log =
+  log(correlation_matrix_input$violations_weighted.cars_mission.pre+1)
+correlation_matrix_input$violations_weighted.cars_mission.pos.log =
+  log(correlation_matrix_input$violations_weighted.cars_mission.pos+1)
 
 correlation_matrix_input$totaid.log = log(correlation_matrix_input$totaid + 1)
 
@@ -194,7 +217,8 @@ We start our exploratory analysis with a high level look at all our variables to
 
 ```{r results="asis"}
 # Use CSV version of Google Sheet 'Variable Description for Introduction': https://docs.google.com/spreadsheets/d/1cas_xxfaAY5CNGDAvBqa4ky5b8m61i3qTSgN4LrHT_g/edit#gid=621892365
-variable_description = read.csv("Lab 1 - Variable Descriptions for Introduction.csv", header = TRUE, sep = ",", quote = "\"", allowEscapes = TRUE)
+variable_description = read.csv("Lab 1 - Variable Descriptions for Introduction.csv", 
+                                header = TRUE, sep = ",", quote = "\"", allowEscapes = TRUE)
 #summary(variable_description)
 
 kable(variable_description, "latex", longtable = TRUE, booktabs = TRUE, caption = "Dataset Variables") %>%
